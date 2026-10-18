@@ -2,6 +2,10 @@
   font-family: Inter, system-ui, Avenir, Arial, Helvetica, sans-serif;
 }
 
+body {
+    overflow: hidden;
+}
+
 #gameCanvas {
     position: fixed;
     inset: 0;
