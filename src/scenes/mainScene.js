@@ -2,6 +2,7 @@ import Phaser from "phaser"
 import Physics from "../classes/physics"
 import Player from "../classes/player"
 import Level from "../classes/level"
+import {Render} from "../classes/render"
 
 
 export default class Main extends Phaser.Scene{
@@ -15,6 +16,9 @@ export default class Main extends Phaser.Scene{
   }
 
   create(){
+    //Initialize render
+    Render.init(this)
+
     //Levels
     this.codes = 
     {
@@ -22,7 +26,6 @@ export default class Main extends Phaser.Scene{
       level2: this.cache.text.get("level2")
     }
     this.level = new Level(this.codes.level1)
-    console.log(this.level.blocks)
 
     //Player
     const player_cursors = this.input.keyboard.addKeys(
@@ -38,10 +41,14 @@ export default class Main extends Phaser.Scene{
 
     //Physics
     this.physics = new Physics()
-    this.physics.addObject(this.player.hitbox)
+    this.physics.addObject(this.player.hitbox) //Add players
+    this.physics.addObject(...this.level.bodies.flat()) //Add level blocks
+
+    //Render
+    this.render = new Render()
   }
 
   update(){
-
+    this.physics.update()
   }
 }
