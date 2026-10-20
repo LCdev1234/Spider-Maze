@@ -33,11 +33,12 @@ export class RigidBody {
 }
 
 export class Rectangle extends RigidBody {
-    constructor(x, y, width, height, state){
+    constructor(x, y, width, height, state, hide = true){
         super(x, y, state)
 
         this.width = width
         this.height = height
+        this.hide = hide
     }
 
     getWidth() {return this.width}

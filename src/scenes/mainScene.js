@@ -41,14 +41,20 @@ export default class Main extends Phaser.Scene{
 
     //Physics
     this.physics = new Physics()
-    this.physics.addObject(this.player.hitbox) //Add players
+    this.physics.addObject(this.player.hitbox) //Add player
     this.physics.addObject(...this.level.bodies.flat()) //Add level blocks
 
     //Render
     this.render = new Render()
+    this.render.addObject(this.player.sprite) //Add player
+    this.render.addObject(...this.level.tile_sprites)
   }
 
   update(){
+    //Updates
+    this.player.update()
     this.physics.update()
+    this.render.update()
+
   }
 }
