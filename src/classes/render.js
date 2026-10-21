@@ -1,5 +1,3 @@
-import { RigidBody } from "./objects"
-
 export class Render {
     static scene
     static init(scene) {Render.scene = scene}
@@ -13,6 +11,15 @@ export class Render {
         this.canvas.setOrigin(0, 0)
         this.canvas.setPosition(Render.scene.scale.width/2 - this.canvas.displayWidth/2, Render.scene.scale.height/2 - this.canvas.displayHeight/2)
         this.sprites = new Set()
+
+        Render.scene.scale.on("resize", (gameSize) => {
+            if(width > height){
+                this.canvas.setScale(Render.scene.scale.width/width)
+            }else{
+                this.canvas.setScale(Render.scene.scale.height/height)
+            }
+            this.canvas.setPosition(Render.scene.scale.width/2 - this.canvas.displayWidth/2, Render.scene.scale.height/2 - this.canvas.displayHeight/2)
+        });
     }
 
     addObject(...renderObject) {
