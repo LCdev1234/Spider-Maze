@@ -32,13 +32,10 @@ export class Render {
     update() {
         this.canvas.clear()
         for(let sprite of this.sprites){
-            let halfWidth = sprite.object.width/2
-            let halfHeight = sprite.object.height/2
-            if(sprite.physicsObject != undefined){
-                if(!sprite.physicsObject.hide){
-                    this.canvas.draw(sprite.object, sprite.physicsObject.x+halfWidth, sprite.physicsObject.y+halfHeight)
-                    this.canvas.render()
-                }
+            let sprite_render = sprite.render()
+            if(sprite_render != undefined){
+                this.canvas.draw(sprite_render.draw, sprite_render.x, sprite_render.y)
+                this.canvas.render()
             }
         }
     }
@@ -50,5 +47,18 @@ export default class RenderObject {
         this.x = x
         this.y = y
         this.physicsObject = physicsObject
+    }
+
+    render() {
+        let halfWidth = this.object.width/2
+        let halfHeight = this.object.height/2
+        if(this.physicsObject != undefined){
+            if(!this.physicsObject.hide){
+                return {draw: this.object, x: this.physicsObject.x+halfWidth + this.x, y:this.physicsObject.y+halfHeight + this.y}
+            }
+        }else{
+            return {draw: this.object, x: this.x, y: this.y}
+        }
+        return undefined
     }
 }

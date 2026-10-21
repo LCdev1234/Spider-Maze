@@ -43,7 +43,17 @@ export default class Level {
         )
         this.tile_sprites = []
         for(let body of this.bodies.flat()){
-            this.tile_sprites.push(new RenderObject(this.sprite, 0, 0, body))
+            this.tile_sprites.push(new LevelRender(this.sprite, 0, 0, body))
         }
+    }
+}
+
+class LevelRender extends RenderObject {
+    constructor(object, x, y, physicsObject = undefined) {
+        super(object, x, y, physicsObject)
+    }
+
+    render() {
+        return undefined
     }
 }
