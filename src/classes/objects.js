@@ -33,7 +33,7 @@ export class RigidBody {
 }
 
 export class Rectangle extends RigidBody {
-    constructor(x, y, width, height, state, hide = true){
+    constructor(x, y, width, height, state, hide = false){
         super(x, y, state)
 
         this.width = width

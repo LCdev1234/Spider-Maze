@@ -45,7 +45,8 @@ export default class Main extends Phaser.Scene{
     this.physics.addObject(...this.level.bodies.flat()) //Add level blocks
 
     //Render
-    this.render = new Render()
+    console.log()
+    this.render = new Render(this.level.tiles_width*this.level.tile_size, this.level.tiles_height*this.level.tile_size)
     this.render.addObject(this.player.sprite) //Add player
     this.render.addObject(...this.level.tile_sprites)
   }
