@@ -25,7 +25,7 @@ export class Render {
     addObject(...renderObject) {
         for(let object of renderObject) {
             this.sprites.add(object)
-            object.object.setVisible(false)
+            object.setVisible(false)
         }
     }
 
@@ -60,5 +60,9 @@ export default class RenderObject {
             return {draw: this.object, x: this.x, y: this.y}
         }
         return undefined
+    }
+
+    setVisible(visible) {
+        this.object.setVisible(visible)
     }
 }
