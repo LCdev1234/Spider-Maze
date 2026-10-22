@@ -146,14 +146,29 @@ class LevelRender extends RenderObject {
             let y = this.physicsObject.getY()
             
             graphics.clear()
+            //Up line
             graphics.lineStyle(2, 0xffffff, 1)
+            graphics.fillStyle(0xffffff, 1)
             graphics.beginPath()
             let difference = LevelRender.tile_size / (this.up.dots.length-1)
             for(let i = 0; i < this.up.dots.length; i++){
-                if(i == 0) graphics.moveTo(0, 0 + this.up.dots[i])
-                else graphics.lineTo(i*difference, 0 + this.up.dots[i])
+                if(i == 0) graphics.moveTo(0, 0 + this.up.dots[i].height)
+                else graphics.lineTo(i*difference, 0 + this.up.dots[i].height)
             }
-            graphics.strokePath()
+            //Right line
+            for(let i = 0; i < this.right.dots.length; i++){
+                graphics.lineTo(LevelRender.tile_size + this.right.dots[i].height, i*difference)
+            }
+            //Down line
+            for(let i = 0; i < this.down.dots.length; i++){
+                graphics.lineTo(LevelRender.tile_size - i*difference, LevelRender.tile_size + this.down.dots[i].height)
+            }
+            //Left line
+            for(let i = 0; i < this.left.dots.length; i++){
+                graphics.lineTo(0 + this.left.dots[i].height, LevelRender.tile_size - i*difference)
+            }
+            graphics.closePath()
+            graphics.fillPath()
             
             return {draw: graphics, x: x, y: y}
         }else {
@@ -163,12 +178,88 @@ class LevelRender extends RenderObject {
 }
 
 class Line {
+    static SPREAD = 0.1
+
     constructor(tile_size) {
         this.dots = []
         for(let i = 0; i < tile_size; i++) {
-            this.dots.push(0)
+            this.dots.push(new Point(0, 0, 0))
         }
         this.next_right
         this.next_left
+    }
+
+    update() {
+        for(let point of this.dots){
+            point.update()
+        }
+
+        let leftPoints = Array(this.dots.length)
+        let rightPoints = Array(this.dots.length)
+
+        for(let n = 0; n < 8; n++){
+            for(let i = 0; i < this.dots.length; i++){
+                if(i == 0){
+                    if(this.next_left){
+                        leftPoints[i] = Line.SPREAD * (this.dots[i].height - this.next_left.dots[this.next_left.dots.length-1].height)
+                        this.next_left.dots[this.next_left.dots.length-1].speed += leftPoints[i]
+                    }
+                }else if(i > 0){
+                    //Left points
+                    leftPoints[i] = Line.SPREAD * (this.dots[i].height - this.dots[i-1].height)
+                    this.dots[i-1].speed += leftPoints[i]
+                }
+
+                if(i == this.dots.length-1){
+                    if(this.next_right){
+                        rightPoints[i] = Line.SPREAD * (this.dots[i].height - this.next_right.dots[0].height)
+                        this.next_right.dots[0].speed += rightPoints[i]
+                    }
+                }else if(i < this.dots.length-1){
+                    //Right points
+                    rightPoints[i] = Line.SPREAD * (this.dots[i].height - this.dots[i+1].height)
+                    this.dots[i+1].speed += rightPoints[i]
+                }
+            }
+
+            for(let i = 0; i < this.dots.length; i++){
+                if(i == 0){
+                    if(this.next_left){
+                        this.next_left.dots[this.next_left.dots.length-1].height += leftPoints[i]
+                    }
+                }else if(i > 0){
+                    this.dots[i-1].height += leftPoints[i]
+                }
+
+                if(i == this.dots.length-1){
+                    if(this.next_right){
+                        this.next_right.dots[0].height += rightPoints[i]
+                    }
+                }else if(i < this.dots.length-1){
+                    this.dots[i+1].height += rightPoints[i]
+                }
+            }
+        }
+    }
+}
+
+class Point {
+    static DAMPENING = 0.025
+    static TENSION = 0.025
+    constructor(height, targetHeight, speed){
+        this.height = height
+        this.targetHeight = targetHeight
+        this.speed = speed
+    }
+
+    update() {
+        let x = this.targetHeight - this.height
+
+        if(Math.abs(x) < 0.5 && Math.abs(this.speed) < 0.1){
+            this.height = this.targetHeight
+        }else{
+            this.speed += Point.TENSION * x - this.speed * Point.DAMPENING
+            this.height += this.speed
+        }
     }
 }

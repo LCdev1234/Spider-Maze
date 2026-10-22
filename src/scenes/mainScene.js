@@ -49,6 +49,9 @@ export default class Main extends Phaser.Scene{
     this.render = new Render(this.level.tiles_width*this.level.tile_size, this.level.tiles_height*this.level.tile_size)
     this.render.addObject(this.player.sprite) //Add player
     this.render.addObject(...this.level.tile_sprites.flat())
+
+
+    this.level.tile_sprites[1][8].up.dots[20].speed = 20
   }
 
   update(time, delta){
@@ -57,6 +60,13 @@ export default class Main extends Phaser.Scene{
     const fpsRatio = Math.min(60 / fps, 2)
 
     //Updates
+    for(let lines of this.level.tile_sprites.flat()){
+      lines.up.update()
+      lines.down.update()
+      lines.right.update()
+      lines.left.update()
+    }
+   
     this.level.update(fpsRatio)
     this.player.update()
     this.physics.update()
