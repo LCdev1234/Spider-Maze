@@ -21,7 +21,7 @@ export default class Player {
     update() {
         const input_x = this.cursors.right.isDown - this.cursors.left.isDown
         const input_y = this.cursors.down.isDown - this.cursors.up.isDown
-        this.hitbox.x += input_x
-        this.hitbox.y += input_y
+        this.hitbox.speed_x += input_x
+        this.hitbox.speed_y += input_y
     }
 }

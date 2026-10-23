@@ -53,7 +53,7 @@ export default class Level {
     }
 }
 
-class LevelRender extends RenderObject {
+export class LevelRender extends RenderObject {
     static tiles = []
     static tile_size
     static tile_sprite

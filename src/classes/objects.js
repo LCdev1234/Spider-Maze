@@ -11,6 +11,8 @@ export class RigidBody {
     constructor(x, y, state){
         this.x = x
         this.y = y
+        this.speed_x = 0
+        this.speed_y = 0
         this.state = state
         this.gravity = Physics.GRAVITY
         this.frction = Physics.FRICTION
@@ -22,8 +24,17 @@ export class RigidBody {
 
     update() {
         if(this.state == RigidBody.STATE.MOVING){
-            this.y -= this.gravity
-            this.x += this.frction
+            this.speed_x *= Physics.FRICTION
+            this.speed_y += Physics.GRAVITY
+            
+            let last_x = this.x
+            this.x += this.speed_x
+            let next_x = this.x
+            if(Physics.touchingSolid(Physics.bodies, this)) this.speed_x = 0
+            this.x = last_x
+            this.y += this.speed_y
+            if(Physics.touchingSolid(Physics.bodies, this)) this.speed_y = 0
+            this.x = next_x
         }
     }
 
@@ -43,4 +54,28 @@ export class Rectangle extends RigidBody {
 
     getWidth() {return this.width}
     getHeight() {return this.height}
+
+    isTouching(shape){
+        if(shape instanceof Rectangle){
+            if(shape.x + shape.getWidth() > this.x &&
+                shape.x < this.x + this.getWidth() &&
+                shape.y + shape.getHeight() > this.y &&
+                shape.y < this.y + this.getHeight()
+            ) {
+                return true
+            }else{
+                return false
+            }
+        }else{
+            if(shape.x > this.x &&
+                shape.x < this.x + this.getWidth() &&
+                shape.y > this.y &&
+                shape.y > this.y + this.getHeight()
+            ) {
+                return true
+            }else{
+                return false
+            }
+        }
+    }
 }
