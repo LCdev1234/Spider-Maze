@@ -22,10 +22,12 @@ export default class Physics {
         for(let body of this.bodies){
             body.update(fpsRatio)
             if(body.state == RigidBody.STATE.MOVING){
+                let speed = 0
+                if(Math.abs(body.speed_x) > Math.abs(body.speed_y)) speed = body.speed_x
+                else speed = body.speed_y
+                if(Math.abs(body.speed_x) > 1 || Math.abs(body.speed_y) > 1) collisionPoints.add({x: body.x, y: body.y, speed: Math.abs(speed)})
                 collision:
                 if(Physics.touchingSolid(this.bodies, body)){
-                    collisionPoints.add({x: body.x, y: body.y})
-
                     let last_x = body.getX()
                     let last_y = body.getY()
 

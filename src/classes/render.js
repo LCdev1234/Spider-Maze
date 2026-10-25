@@ -3,10 +3,16 @@ export class Render {
     static init(scene) {Render.scene = scene}
     constructor(width, height) {
         this.canvas = Render.scene.add.renderTexture(0, 0, width, height)
+        this.background = Render.scene.add.image(0, 0, "background")
+        this.background.setVisible(false)
+        this.background.setOrigin(0, 0.5)
+        this.background.setPosition(0, 0)
         if(width > height){
             this.canvas.setScale(Render.scene.scale.width/width)
+            this.background.setScale((this.background.scale*width)/this.background.width)
         }else{
             this.canvas.setScale(Render.scene.scale.height/height)
+            this.background.setScale((this.background.scale*height)/this.background.height)
         }
         this.canvas.setOrigin(0, 0)
         this.canvas.setPosition(Render.scene.scale.width/2 - this.canvas.displayWidth/2, Render.scene.scale.height/2 - this.canvas.displayHeight/2)
@@ -32,6 +38,7 @@ export class Render {
     update() {
         this.canvas.clear()
         this.canvas.fill(0xffffff)
+        this.canvas.draw(this.background)
         for(let sprite of this.sprites){
             let sprite_render = sprite.render()
             if(sprite_render != undefined){

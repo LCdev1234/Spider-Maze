@@ -177,11 +177,11 @@ export class LevelRender extends RenderObject {
 }
 
 class Line {
-    static SPREAD = 0.1
+    static SPREAD = 0.04
 
     constructor(tile_size) {
         this.dots = []
-        for(let i = 0; i < tile_size; i++) {
+        for(let i = 0; i < tile_size/2; i++) {
             this.dots.push(new Point(0, 0, 0))
         }
         this.next_right
@@ -244,7 +244,7 @@ class Line {
 
 class Point {
     static DAMPENING = 0.025
-    static TENSION = 0.025
+    static TENSION = 0.2
     constructor(height, targetHeight, speed){
         this.height = height
         this.targetHeight = targetHeight

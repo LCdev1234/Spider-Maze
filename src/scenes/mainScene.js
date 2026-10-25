@@ -1,7 +1,7 @@
 import Phaser from "phaser"
 import Physics from "../classes/physics"
 import Player from "../classes/player"
-import Level from "../classes/level"
+import Level, { LevelRender } from "../classes/level"
 import {Render} from "../classes/render"
 
 
@@ -13,6 +13,7 @@ export default class Main extends Phaser.Scene{
   preload(){
     this.load.text("level1", "src/levels/level1.txt")
     this.load.text("level2", "src/levels/level2.txt")
+    this.load.image("background", "src/assets/background.png")
   }
 
   create(){
@@ -37,7 +38,7 @@ export default class Main extends Phaser.Scene{
         jump: Phaser.Input.Keyboard.KeyCodes.SPACE
       }
     )
-    this.player = new Player(player_cursors, 0, 0)
+    this.player = new Player(player_cursors, 60, 60)
 
     //Physics
     this.physics = new Physics()
@@ -52,9 +53,6 @@ export default class Main extends Phaser.Scene{
     this.render = new Render(this.level.tiles_width*this.level.tile_size, this.level.tiles_height*this.level.tile_size)
     this.render.addObject(this.player.sprite) //Add player
     this.render.addObject(...this.level.tile_sprites.flat())
-
-
-    this.level.tile_sprites[2][8].up.dots[20].speed = 20
   }
 
   update(time, delta){
@@ -73,7 +71,9 @@ export default class Main extends Phaser.Scene{
     this.level.update(fpsRatio)
     this.player.update()
     const collisionPoints = this.physics.update(fpsRatio)
-    for(let {x, y} of collisionPoints){
+    for(let {x, y, speed} of collisionPoints){
+      x += 10
+      y += 10
       if(!this.level.tile_sprites?.[Math.floor(y / this.level.tile_size)]?.[Math.floor(x / this.level.tile_size)]?.physicsObject.hide) {
         
       }else{
@@ -88,17 +88,62 @@ export default class Main extends Phaser.Scene{
             let list_x = Math.floor(x/this.level.tile_size) + (nx -1)
             let list_y = Math.floor(y/this.level.tile_size) + (ny -1)
             if(list_x >= 0 && list_y >= 0 && list_y < this.level.tiles.length && list_x < this.level.tiles[list_y].length) {
-              sides[ny][nx] = this.level.tile_sprites[list_y][list_x]
+              if(this.level.tiles[list_y][list_x] == 1) sides[ny][nx] = this.level.tile_sprites[list_y][list_x]
+              else sides[ny][nx] = -1
             }else sides[ny][nx] = -1
           }
         }
+
+        let closest = {x: 0, y:0}
+        let min_distance = 1000000
+
+        let distance = getDistance(sides[0][1]?.physicsObject?.getX() + LevelRender.tile_size/2, sides[0][1]?.physicsObject?.getY() + LevelRender.tile_size/2, x, y)
+        if(distance < min_distance){
+          min_distance = distance
+          closest = {x: 1, y: 0}
+        }
         
-        console.log(sides)
-        //this.level.tile_sprites[Math.floor(y / this.level.tile_size)+1][Math.floor(x / this.level.tile_size)].up.dots[20].speed = 2
+        distance = getDistance(sides[1][0]?.physicsObject?.getX() + LevelRender.tile_size/2, sides[1][0]?.physicsObject?.getY() + LevelRender.tile_size/2, x, y)
+        if(distance < min_distance){
+          closest = {x: 0, y: 1}
+          min_distance = distance
+        }
+
+        distance = getDistance(sides[1][2]?.physicsObject?.getX() + LevelRender.tile_size/2, sides[1][2]?.physicsObject?.getY() + LevelRender.tile_size/2, x, y)
+        if(distance < min_distance){
+          closest = {x: 2, y: 1}
+          min_distance = distance
+        }
+
+        distance = getDistance(sides[2][1]?.physicsObject?.getX() + LevelRender.tile_size/2, sides[2][1]?.physicsObject?.getY() + LevelRender.tile_size/2, x, y)
+        if(distance < min_distance){
+          closest = {x: 1, y: 2}
+          min_distance = distance
+        }
+
+        
+        if(closest.x == 1 && closest.y == 2){
+          let dots = sides[closest.y][closest.x].up.dots[Math.floor(x%(LevelRender.tile_size/2))]
+          dots.speed = Math.min(5, dots.speed + speed*2)
+        }else if(closest.x == 2 && closest.y == 1){
+          let dots = sides[closest.y][closest.x].left.dots[Math.floor(y%(LevelRender.tile_size/2))]
+          dots.speed = Math.min(5, dots.speed + speed/1)
+        }else if(closest.x == 0 && closest.y == 1){
+          let dots = sides[closest.y][closest.x].right.dots[Math.floor(y%(LevelRender.tile_size/2))]
+          dots.speed = Math.max(-5, dots.speed - speed/1)
+        }else if(closest.x == 1 && closest.y == 0){
+          let dots = sides[closest.y][closest.x].down.dots[Math.floor(x%(LevelRender.tile_size/2))]
+          dots.speed = Math.max(-5, dots.speed - speed/1)
+        }
       }
       
     }
     this.render.update()
 
   }
+}
+
+function getDistance(x1, y1, x2, y2){
+  if(!x1 || !y1 || !x2 || !y2) return 1000000000
+  return (x2-x1)**2 + (y2-y1)**2
 }
