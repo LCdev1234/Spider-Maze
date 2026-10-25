@@ -16,13 +16,17 @@ export class RigidBody {
         this.state = state
         this.gravity = Physics.GRAVITY
         this.frction = Physics.FRICTION
+        this.inGround = true
+        this.tag = ""
+        this.sliding = 0
+        this.sliding_x = 0
     }
 
     getX() {return this.x}
     getY() {return this.y}
     getState() {return this.state}
 
-    update() {
+    update(fpsRatio) {
         if(this.state == RigidBody.STATE.MOVING){
             this.speed_x *= Physics.FRICTION
             this.speed_y += Physics.GRAVITY
@@ -30,10 +34,27 @@ export class RigidBody {
             let last_x = this.x
             this.x += this.speed_x
             let next_x = this.x
-            if(Physics.touchingSolid(Physics.bodies, this)) this.speed_x = 0
+            this.sliding = Math.max(0, this.sliding-(1*fpsRatio))
+            if(Physics.touchingSolid(Physics.bodies, this)) {
+                if(this.tag == "player") {
+                    if(this.speed_y > 0) {
+                        this.sliding = 10
+                        this.sliding_x = -Math.sign(this.speed_x)
+                    }
+                }
+                this.speed_x = 0
+            }
+            if(this.speed_y > 0 && this.sliding > 0){
+                this.speed_y *= 0.5
+            }
             this.x = last_x
             this.y += this.speed_y
-            if(Physics.touchingSolid(Physics.bodies, this)) this.speed_y = 0
+            if(Physics.touchingSolid(Physics.bodies, this)){
+                if(this.speed_y > 0) this.inGround = true
+                this.speed_y = 0
+            }else{
+                this.inGround = false
+            }
             this.x = next_x
         }
     }

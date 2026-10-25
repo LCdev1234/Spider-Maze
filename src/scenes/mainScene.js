@@ -54,7 +54,7 @@ export default class Main extends Phaser.Scene{
     this.render.addObject(...this.level.tile_sprites.flat())
 
 
-    this.level.tile_sprites[1][8].up.dots[20].speed = 20
+    this.level.tile_sprites[2][8].up.dots[20].speed = 20
   }
 
   update(time, delta){
@@ -72,7 +72,32 @@ export default class Main extends Phaser.Scene{
    
     this.level.update(fpsRatio)
     this.player.update()
-    this.physics.update()
+    const collisionPoints = this.physics.update(fpsRatio)
+    for(let {x, y} of collisionPoints){
+      if(!this.level.tile_sprites?.[Math.floor(y / this.level.tile_size)]?.[Math.floor(x / this.level.tile_size)]?.physicsObject.hide) {
+        
+      }else{
+        let sides = 
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ]
+        for(let ny = 0; ny < 3; ny++){
+          for(let nx = 0; nx < 3; nx++){
+            let list_x = Math.floor(x/this.level.tile_size) + (nx -1)
+            let list_y = Math.floor(y/this.level.tile_size) + (ny -1)
+            if(list_x >= 0 && list_y >= 0 && list_y < this.level.tiles.length && list_x < this.level.tiles[list_y].length) {
+              sides[ny][nx] = this.level.tile_sprites[list_y][list_x]
+            }else sides[ny][nx] = -1
+          }
+        }
+        
+        console.log(sides)
+        //this.level.tile_sprites[Math.floor(y / this.level.tile_size)+1][Math.floor(x / this.level.tile_size)].up.dots[20].speed = 2
+      }
+      
+    }
     this.render.update()
 
   }

@@ -147,8 +147,7 @@ export class LevelRender extends RenderObject {
             
             graphics.clear()
             //Up line
-            graphics.lineStyle(2, 0xffffff, 1)
-            graphics.fillStyle(0xffffff, 1)
+            graphics.fillStyle(0x000000, 1)
             graphics.beginPath()
             let difference = LevelRender.tile_size / (this.up.dots.length-1)
             for(let i = 0; i < this.up.dots.length; i++){

@@ -31,6 +31,7 @@ export class Render {
 
     update() {
         this.canvas.clear()
+        this.canvas.fill(0xffffff)
         for(let sprite of this.sprites){
             let sprite_render = sprite.render()
             if(sprite_render != undefined){

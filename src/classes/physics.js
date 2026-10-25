@@ -2,8 +2,8 @@ import { LevelRender } from "./level"
 import { RigidBody } from "./objects"
 
 export default class Physics {
-    static GRAVITY = 0.9
-    static FRICTION = 0.85
+    static GRAVITY = 0.85
+    static FRICTION = 0.75
     static bodies
 
     constructor() {
@@ -17,12 +17,15 @@ export default class Physics {
         }
     }
 
-    update() {
+    update(fpsRatio) {
+        let collisionPoints = new Set()
         for(let body of this.bodies){
-            body.update()
+            body.update(fpsRatio)
             if(body.state == RigidBody.STATE.MOVING){
                 collision:
                 if(Physics.touchingSolid(this.bodies, body)){
+                    collisionPoints.add({x: body.x, y: body.y})
+
                     let last_x = body.getX()
                     let last_y = body.getY()
 
@@ -41,6 +44,7 @@ export default class Physics {
                 }
             }
         }
+        return collisionPoints
     }
 
     static touchingSolid(bodies, shape) {
