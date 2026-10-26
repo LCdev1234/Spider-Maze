@@ -28,9 +28,19 @@ export class Render {
 
         Render.scene.scale.on("resize", (gameSize) => {
             if(width > height){
-                this.canvas.setScale(Render.scene.scale.width/width)
+                if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
+                    this.canvas.setScale(Render.scene.scale.height/height)
+                }else{
+                    this.canvas.setScale(Render.scene.scale.width/width)
+                }
+                this.background.setScale((this.background.scale*width)/this.background.width)
             }else{
-                this.canvas.setScale(Render.scene.scale.height/height)
+                if(height/width < Render.scene.scale.height/Render.scene.scale.width) {
+                    this.canvas.setScale(Render.scene.scale.width/width)
+                }else{
+                    this.canvas.setScale(Render.scene.scale.height/height)
+                }
+                this.background.setScale((this.background.scale*height)/this.background.height)
             }
             this.canvas.setPosition(Render.scene.scale.width/2 - this.canvas.displayWidth/2, Render.scene.scale.height/2 - this.canvas.displayHeight/2)
         });
