@@ -189,6 +189,13 @@ class Line {
     }
 
     update() {
+        let count = 0
+        for(let point of this.dots){
+            if(point.height == point.targetHeight && point.speed == 0){
+                count++
+            }
+        }
+        if(count == this.dots.length) return
         for(let point of this.dots){
             point.update()
         }
