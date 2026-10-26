@@ -5,7 +5,7 @@ import {Render} from "./render"
 import Phaser from "phaser"
 
 export default class Player {
-    static speed = 1.5
+    static speed = 1.6
 
     constructor(cursors, x, y) {
         this.cursors = cursors
@@ -61,7 +61,7 @@ export default class Player {
         //const input_y = this.cursors.down.isDown - this.cursors.up.isDown
         this.hitbox.speed_x += input_x * Player.speed
         if(this.canJump && jump && this.hitbox.inGround) {
-            this.hitbox.speed_y += -10
+            this.hitbox.speed_y += -13
             this.canJump = false
             Phaser.Input.Keyboard.JustDown(this.cursors.up)
         }else if(this.hitbox.inGround) this.canJump = true

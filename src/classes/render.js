@@ -9,16 +9,16 @@ export class Render {
         this.background.setPosition(0, height)
         if(width > height){
             if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
-                this.canvas.setScale(Render.scene.scale.height/(height/2))
+                this.canvas.setScale(Render.scene.scale.height/(height/4))
             }else{
-                this.canvas.setScale(Render.scene.scale.width/(width/2))
+                this.canvas.setScale(Render.scene.scale.width/(width/4))
             }
             this.background.setScale((this.background.scale*width)/this.background.width)
         }else{
             if(height/width < Render.scene.scale.height/Render.scene.scale.width) {
-                this.canvas.setScale(Render.scene.scale.width/(width/2))
+                this.canvas.setScale(Render.scene.scale.width/(width/4))
             }else{
-                this.canvas.setScale(Render.scene.scale.height/(height/2))
+                this.canvas.setScale(Render.scene.scale.height/(height/4))
             }
             this.background.setScale((this.background.scale*height)/this.background.height)
         }
@@ -29,16 +29,16 @@ export class Render {
         Render.scene.scale.on("resize", (gameSize) => {
             if(width > height){
                 if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
-                    this.canvas.setScale(Render.scene.scale.height/(height/2))
+                    this.canvas.setScale(Render.scene.scale.height/(height/4))
                 }else{
-                    this.canvas.setScale(Render.scene.scale.width/(width/2))
+                    this.canvas.setScale(Render.scene.scale.width/(width/4))
                 }
                 this.background.setScale((this.background.scale*width)/this.background.width)
             }else{
                 if(height/width < Render.scene.scale.height/Render.scene.scale.width) {
-                    this.canvas.setScale(Render.scene.scale.width/(width/2))
+                    this.canvas.setScale(Render.scene.scale.width/(width/4))
                 }else{
-                    this.canvas.setScale(Render.scene.scale.height/(height/2))
+                    this.canvas.setScale(Render.scene.scale.height/(height/4))
                 }
                 this.background.setScale((this.background.scale*height)/this.background.height)
             }
@@ -54,12 +54,16 @@ export class Render {
     }
 
     update(x, y) {
-        this.canvas.setPosition((-x + this.canvas.width/4)*this.canvas.scale, (-y + this.canvas.height/4)*this.canvas.scale)
+        this.canvas.setPosition((-x + this.canvas.width/8)*this.canvas.scale, (-y + this.canvas.height/8)*this.canvas.scale)
         this.canvas.clear()
         this.canvas.fill(0xffffff)
         this.canvas.draw(this.background)
         for(let sprite of this.sprites){
-            let sprite_render = sprite.render()
+            let sprite_render
+            if(sprite.physicsObject.x < x+this.canvas.width/7+100 && sprite.physicsObject.x > x-this.canvas.width/7-100
+                && sprite.physicsObject.y > y-this.canvas.height/7-100 && sprite.physicsObject.y < y+this.canvas.height/7+100){
+                    sprite_render = sprite.render()
+                }
             if(sprite_render != undefined){
                 this.canvas.draw(sprite_render.draw, sprite_render.x, sprite_render.y)
                 this.canvas.render()
