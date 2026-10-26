@@ -9,16 +9,16 @@ export class Render {
         this.background.setPosition(0, height)
         if(width > height){
             if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
-                this.canvas.setScale(Render.scene.scale.height/height)
+                this.canvas.setScale(Render.scene.scale.height/(height/2))
             }else{
-                this.canvas.setScale(Render.scene.scale.width/width)
+                this.canvas.setScale(Render.scene.scale.width/(width/2))
             }
             this.background.setScale((this.background.scale*width)/this.background.width)
         }else{
             if(height/width < Render.scene.scale.height/Render.scene.scale.width) {
-                this.canvas.setScale(Render.scene.scale.width/width)
+                this.canvas.setScale(Render.scene.scale.width/(width/2))
             }else{
-                this.canvas.setScale(Render.scene.scale.height/height)
+                this.canvas.setScale(Render.scene.scale.height/(height/2))
             }
             this.background.setScale((this.background.scale*height)/this.background.height)
         }
@@ -29,16 +29,16 @@ export class Render {
         Render.scene.scale.on("resize", (gameSize) => {
             if(width > height){
                 if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
-                    this.canvas.setScale(Render.scene.scale.height/height)
+                    this.canvas.setScale(Render.scene.scale.height/(height/2))
                 }else{
-                    this.canvas.setScale(Render.scene.scale.width/width)
+                    this.canvas.setScale(Render.scene.scale.width/(width/2))
                 }
                 this.background.setScale((this.background.scale*width)/this.background.width)
             }else{
                 if(height/width < Render.scene.scale.height/Render.scene.scale.width) {
-                    this.canvas.setScale(Render.scene.scale.width/width)
+                    this.canvas.setScale(Render.scene.scale.width/(width/2))
                 }else{
-                    this.canvas.setScale(Render.scene.scale.height/height)
+                    this.canvas.setScale(Render.scene.scale.height/(height/2))
                 }
                 this.background.setScale((this.background.scale*height)/this.background.height)
             }
@@ -53,7 +53,8 @@ export class Render {
         }
     }
 
-    update() {
+    update(x, y) {
+        this.canvas.setPosition((-x + this.canvas.width/4)*this.canvas.scale, (-y + this.canvas.height/4)*this.canvas.scale)
         this.canvas.clear()
         this.canvas.fill(0xffffff)
         this.canvas.draw(this.background)

@@ -150,21 +150,36 @@ export class LevelRender extends RenderObject {
             graphics.fillStyle(0x000000, 1)
             graphics.beginPath()
             let difference = LevelRender.tile_size / (this.up.dots.length-1)
-            for(let i = 0; i < this.up.dots.length; i++){
-                if(i == 0) graphics.moveTo(0, 0 + this.up.dots[i].height)
-                else graphics.lineTo(i*difference, 0 + this.up.dots[i].height)
+            if(this.up.drawComplete) {
+                for(let i = 0; i < this.up.dots.length; i++){
+                    if(i == 0) graphics.moveTo(0, 0 + this.up.dots[i].height)
+                    else graphics.lineTo(i*difference, 0 + this.up.dots[i].height)
+                }
+            }else {
+                graphics.moveTo(0, 0)
+                graphics.lineTo(LevelRender.tile_size, 0)
             }
             //Right line
-            for(let i = 0; i < this.right.dots.length; i++){
-                graphics.lineTo(LevelRender.tile_size + this.right.dots[i].height, i*difference)
+            if(this.right.drawComplete){
+                for(let i = 0; i < this.right.dots.length; i++){
+                    graphics.lineTo(LevelRender.tile_size + this.right.dots[i].height, i*difference)
+                }
+            }else{
+                graphics.lineTo(LevelRender.tile_size, LevelRender.tile_size)
             }
             //Down line
-            for(let i = 0; i < this.down.dots.length; i++){
-                graphics.lineTo(LevelRender.tile_size - i*difference, LevelRender.tile_size + this.down.dots[i].height)
+            if(this.down.drawComplete){
+                for(let i = 0; i < this.down.dots.length; i++){
+                    graphics.lineTo(LevelRender.tile_size - i*difference, LevelRender.tile_size + this.down.dots[i].height)
+                }
+            }else{
+                graphics.lineTo(0, LevelRender.tile_size)
             }
             //Left line
-            for(let i = 0; i < this.left.dots.length; i++){
-                graphics.lineTo(0 + this.left.dots[i].height, LevelRender.tile_size - i*difference)
+            if(this.left.drawComplete){
+                for(let i = 0; i < this.left.dots.length; i++){
+                    graphics.lineTo(0 + this.left.dots[i].height, LevelRender.tile_size - i*difference)
+                }
             }
             graphics.closePath()
             graphics.fillPath()
@@ -186,16 +201,22 @@ class Line {
         }
         this.next_right
         this.next_left
+        this.drawComplete = true
     }
 
     update() {
         let count = 0
         for(let point of this.dots){
-            if(point.height == point.targetHeight && point.speed == 0){
+            if(Math.floor(point.height) == Math.floor(point.targetHeight) && Math.abs(point.speed) < 0.1){
                 count++
             }
         }
-        if(count == this.dots.length) return
+        if(count == this.dots.length) {
+            this.drawComplete = false
+            return
+        }else{
+            this.drawComplete = true
+        }
         for(let point of this.dots){
             point.update()
         }

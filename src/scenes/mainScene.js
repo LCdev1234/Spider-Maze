@@ -52,6 +52,7 @@ export default class Main extends Phaser.Scene{
     console.log()
     this.render = new Render(this.level.tiles_width*this.level.tile_size, this.level.tiles_height*this.level.tile_size)
     this.render.addObject(this.player.sprite) //Add player
+    this.render.addObject(this.player.eye1, this.player.eye2)
     this.render.addObject(...this.level.tile_sprites.flat())
   }
 
@@ -138,7 +139,7 @@ export default class Main extends Phaser.Scene{
       }
       
     }
-    this.render.update()
+    this.render.update(this.player.hitbox.x, this.player.hitbox.y)
 
   }
 }

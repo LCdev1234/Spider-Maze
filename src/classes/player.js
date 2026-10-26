@@ -22,10 +22,40 @@ export default class Player {
             0x000000
         ), 0, 0, this.hitbox)
 
+        this.eye_timer = 0
+
+        this.eye1 = new RenderObject(Render.scene.add.rectangle(
+            3.5,
+            5,
+            5,
+            5,
+            0xffffff
+        ), 0, 0, this.hitbox)
+        this.eye2 = new RenderObject(Render.scene.add.rectangle(
+            12.5,
+            5,
+            5,
+            5,
+            0xffffff
+        ), 0, 0, this.hitbox)
+
         this.canJump = true
     }
 
     update() {
+        this.eye_timer++
+        if(this.eye_timer > 90){
+            this.eye1.object.height = 1
+            this.eye1.object.y = 8
+            this.eye2.object.height = 1
+            this.eye2.object.y = 8
+            if(this.eye_timer > 100 + Math.floor(Math.random() * 20)) this.eye_timer = 0
+        }else{
+            this.eye1.object.height = 5
+            this.eye1.object.y = 5
+            this.eye2.object.height = 5
+            this.eye2.object.y = 5
+        }
         const input_x = this.cursors.right.isDown - this.cursors.left.isDown
         const jump = this.cursors.up.isDown
         //const input_y = this.cursors.down.isDown - this.cursors.up.isDown
