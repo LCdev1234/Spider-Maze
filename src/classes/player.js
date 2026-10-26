@@ -18,8 +18,8 @@ export default class Player {
             0,
             0,
             20,
-            20,
-            0xff0000
+            23,
+            0x000000
         ), 0, 0, this.hitbox)
 
         this.canJump = true

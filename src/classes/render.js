@@ -5,8 +5,8 @@ export class Render {
         this.canvas = Render.scene.add.renderTexture(0, 0, width, height)
         this.background = Render.scene.add.image(0, 0, "background")
         this.background.setVisible(false)
-        this.background.setOrigin(0, 0.5)
-        this.background.setPosition(0, 0)
+        this.background.setOrigin(0, 1)
+        this.background.setPosition(0, height)
         if(width > height){
             this.canvas.setScale(Render.scene.scale.width/width)
             this.background.setScale((this.background.scale*width)/this.background.width)
