@@ -32,7 +32,11 @@ export class RigidBody {
             this.speed_y += Physics.GRAVITY
             
             let last_x = this.x
-            this.x += this.speed_x
+            for(let add = 0; add < 20; add++){
+                this.x += this.speed_x/20
+                if(Physics.touchingSolid(Physics.bodies, this)) break
+            }
+            //this.x += this.speed_x
             let next_x = this.x
             this.sliding = Math.max(0, this.sliding-(1*fpsRatio))
             if(Physics.touchingSolid(Physics.bodies, this)) {
@@ -48,7 +52,11 @@ export class RigidBody {
                 this.speed_y *= 0.5
             }
             this.x = last_x
-            this.y += this.speed_y
+            //this.y += this.speed_y
+            for(let add = 0; add < 20; add++){
+                this.y += this.speed_y/20
+                if(Physics.touchingSolid(Physics.bodies, this)) break
+            }
             if(Physics.touchingSolid(Physics.bodies, this)){
                 if(this.speed_y > 0) this.inGround = true
                 this.speed_y = 0

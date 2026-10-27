@@ -51,9 +51,9 @@ export default class Main extends Phaser.Scene{
     //Render
     console.log()
     this.render = new Render(this.level.tiles_width*this.level.tile_size, this.level.tiles_height*this.level.tile_size)
+    this.render.addObject(...this.level.tile_sprites.flat())
     this.render.addObject(this.player.sprite) //Add player
     this.render.addObject(this.player.eye1, this.player.eye2)
-    this.render.addObject(...this.level.tile_sprites.flat())
   }
 
   update(time, delta){

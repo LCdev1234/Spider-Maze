@@ -6,7 +6,17 @@ export class Render {
         this.background = Render.scene.add.image(0, 0, "background")
         this.background.setVisible(false)
         this.background.setOrigin(0, 1)
-        this.background.setPosition(0, height)
+        this.background.falseHeight = height
+        
+        this.light = Render.scene.add.renderTexture(0, 0, Render.scene.scale.width, Render.scene.scale.height)
+        this.light.setOrigin(0, 0)
+        this.light_graphics = Render.scene.add.graphics()
+        this.light_graphics.setVisible(false)
+        this.drawLights()
+
+        this.light_blinks = 0       
+
+        
         if(width > height){
             if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
                 this.canvas.setScale(Render.scene.scale.height/(height/4))
@@ -27,6 +37,7 @@ export class Render {
         this.sprites = new Set()
 
         Render.scene.scale.on("resize", (gameSize) => {
+            console.log(width)
             if(width > height){
                 if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
                     this.canvas.setScale(Render.scene.scale.height/(height/4))
@@ -43,6 +54,9 @@ export class Render {
                 this.background.setScale((this.background.scale*height)/this.background.height)
             }
             this.canvas.setPosition(Render.scene.scale.width/2 - this.canvas.displayWidth/2, Render.scene.scale.height/2 - this.canvas.displayHeight/2)
+
+            this.light.resize(Render.scene.scale.width, Render.scene.scale.height)
+            this.drawLights()
         });
     }
 
@@ -54,21 +68,48 @@ export class Render {
     }
 
     update(x, y) {
-        this.canvas.setPosition((-x + this.canvas.width/8)*this.canvas.scale, (-y + this.canvas.height/8)*this.canvas.scale)
+        this.canvas.setPosition((-x-10)*this.canvas.scale + Render.scene.scale.width/2, (-y-10)*this.canvas.scale + Render.scene.scale.height/2)
         this.canvas.clear()
         this.canvas.fill(0xffffff)
-        this.canvas.draw(this.background)
+        this.canvas.draw(this.background, 0, this.background.falseHeight)
+        this.canvas.render()
         for(let sprite of this.sprites){
             let sprite_render
-            if(sprite.physicsObject.x < x+this.canvas.width/7+100 && sprite.physicsObject.x > x-this.canvas.width/7-100
-                && sprite.physicsObject.y > y-this.canvas.height/7-100 && sprite.physicsObject.y < y+this.canvas.height/7+100){
-                    sprite_render = sprite.render()
-                }
+            sprite_render = sprite.render()
             if(sprite_render != undefined){
                 this.canvas.draw(sprite_render.draw, sprite_render.x, sprite_render.y)
                 this.canvas.render()
             }
         }
+        this.drawLights()
+    }
+
+    drawLights(){
+        this.light_blinks++
+        this.light.clear()
+        this.light_graphics.clear()
+        this.light_graphics.fillStyle(0x170101, 1)
+        this.light_graphics.fillRect(0, 0, Render.scene.scale.width, Render.scene.scale.height);
+        this.light.draw(this.light_graphics, 0, 0)
+        this.light.render()
+        if(this.light_blinks < 300 || this.light_blinks % 20 < 12 + 5*Math.random()){
+            this.light_graphics.clear()
+            this.light_graphics.fillStyle(0xffffff, 0.05)
+            this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, Render.scene.scale.height/2.2)
+            this.light_graphics.fillStyle(0xffffff, 0.1)
+            this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, 350/400 * Render.scene.scale.height/2.2)
+            this.light_graphics.fillStyle(0xffffff, 0.2)
+            this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, 325/400 * Render.scene.scale.height/2.2)
+            this.light_graphics.fillStyle(0xffffff, 0.1)
+            this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, 225/400 * Render.scene.scale.height/2.2)
+            this.light_graphics.fillStyle(0xffffff, 0.3)
+            this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, 150/400 * Render.scene.scale.height/2.2)
+            this.light_graphics.fillStyle(0xffffff, 0.6)
+            this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, 100/400 * Render.scene.scale.height/2.2)
+            this.light.erase(this.light_graphics, 0, 0)
+            this.light.render()
+        }
+        if(this.light_blinks > 370) this.light_blinks = 0
     }
 }
 
