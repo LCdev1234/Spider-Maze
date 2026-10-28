@@ -15,11 +15,13 @@ export class RigidBody {
         this.speed_y = 0
         this.state = state
         this.gravity = Physics.GRAVITY
-        this.frction = Physics.FRICTION
+        this.friction_x = Physics.FRICTION
+        this.friction_y = 1
         this.inGround = true
         this.tag = ""
         this.sliding = 0
         this.sliding_x = 0
+        this.inverse = false
     }
 
     getX() {return this.x}
@@ -28,8 +30,9 @@ export class RigidBody {
 
     update(fpsRatio) {
         if(this.state == RigidBody.STATE.MOVING){
-            this.speed_x *= Physics.FRICTION
-            this.speed_y += Physics.GRAVITY
+            this.speed_x *= this.friction_x
+            this.speed_y *= this.friction_y
+            this.speed_y += this.gravity
             
             let last_x = this.x
             for(let add = 0; add < 20; add++){
@@ -48,7 +51,7 @@ export class RigidBody {
                 }
                 this.speed_x = 0
             }
-            if(this.speed_y > 0 && this.sliding > 0){
+            if(this.speed_y > 0 && this.sliding > 0 && !this.inverse){
                 this.speed_y *= 0.5
             }
             this.x = last_x

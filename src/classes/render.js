@@ -1,12 +1,19 @@
 export class Render {
+    static width
+    static height
     static scene
     static init(scene) {Render.scene = scene}
     constructor(width, height) {
+        Render.width = width
+        Render.height = height
+        
         this.canvas = Render.scene.add.renderTexture(0, 0, width, height)
         this.background = Render.scene.add.image(0, 0, "background")
         this.background.setVisible(false)
         this.background.setOrigin(0, 1)
         this.background.falseHeight = height
+        this.background_width = this.background.width
+        this.background_height = this.background_height
         
         this.light = Render.scene.add.renderTexture(0, 0, Render.scene.scale.width, Render.scene.scale.height)
         this.light.setOrigin(0, 0)
@@ -23,35 +30,34 @@ export class Render {
             }else{
                 this.canvas.setScale(Render.scene.scale.width/(width/4))
             }
-            this.background.setScale((this.background.scale*width)/this.background.width)
+            this.background.setScale((width)/this.background_width)
         }else{
             if(height/width < Render.scene.scale.height/Render.scene.scale.width) {
                 this.canvas.setScale(Render.scene.scale.width/(width/4))
             }else{
                 this.canvas.setScale(Render.scene.scale.height/(height/4))
             }
-            this.background.setScale((this.background.scale*height)/this.background.height)
+            this.background.setScale((height)/this.background_height)
         }
         this.canvas.setOrigin(0, 0)
         this.canvas.setPosition(Render.scene.scale.width/2 - this.canvas.displayWidth/2, Render.scene.scale.height/2 - this.canvas.displayHeight/2)
         this.sprites = new Set()
 
         Render.scene.scale.on("resize", (gameSize) => {
-            console.log(width)
             if(width > height){
                 if(width/height < Render.scene.scale.width/Render.scene.scale.height) {
                     this.canvas.setScale(Render.scene.scale.height/(height/4))
                 }else{
                     this.canvas.setScale(Render.scene.scale.width/(width/4))
                 }
-                this.background.setScale((this.background.scale*width)/this.background.width)
+                this.background.setScale((width)/this.background_width)
             }else{
                 if(height/width < Render.scene.scale.height/Render.scene.scale.width) {
                     this.canvas.setScale(Render.scene.scale.width/(width/4))
                 }else{
                     this.canvas.setScale(Render.scene.scale.height/(height/4))
                 }
-                this.background.setScale((this.background.scale*height)/this.background.height)
+                this.background.setScale((height)/this.background_height)
             }
             this.canvas.setPosition(Render.scene.scale.width/2 - this.canvas.displayWidth/2, Render.scene.scale.height/2 - this.canvas.displayHeight/2)
 
@@ -92,7 +98,7 @@ export class Render {
         this.light_graphics.fillRect(0, 0, Render.scene.scale.width, Render.scene.scale.height);
         this.light.draw(this.light_graphics, 0, 0)
         this.light.render()
-        if(this.light_blinks < 300 || this.light_blinks % 20 < 12 + 5*Math.random()){
+        if(this.light_blinks < 500 || this.light_blinks % 20 < 12 + 5*Math.random()){
             this.light_graphics.clear()
             this.light_graphics.fillStyle(0xffffff, 0.05)
             this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, Render.scene.scale.height/2.2)
@@ -109,7 +115,7 @@ export class Render {
             this.light.erase(this.light_graphics, 0, 0)
             this.light.render()
         }
-        if(this.light_blinks > 370) this.light_blinks = 0
+        if(this.light_blinks > 570) this.light_blinks = 0
     }
 }
 
@@ -119,17 +125,20 @@ export default class RenderObject {
         this.x = x
         this.y = y
         this.physicsObject = physicsObject
+        this.hide = false
     }
 
     render() {
-        let halfWidth = this.object.width/2
-        let halfHeight = this.object.height/2
-        if(this.physicsObject != undefined){
-            if(!this.physicsObject.hide){
-                return {draw: this.object, x: this.physicsObject.x+halfWidth + this.x, y:this.physicsObject.y+halfHeight + this.y}
+        if(!this.hide) {
+            let halfWidth = this.object.width/2
+            let halfHeight = this.object.height/2
+            if(this.physicsObject != undefined){
+                if(!this.physicsObject.hide){
+                    return {draw: this.object, x: this.physicsObject.x+halfWidth + this.x, y:this.physicsObject.y+halfHeight + this.y}
+                }
+            }else{
+                return {draw: this.object, x: this.x, y: this.y}
             }
-        }else{
-            return {draw: this.object, x: this.x, y: this.y}
         }
         return undefined
     }

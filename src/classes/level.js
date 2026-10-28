@@ -90,6 +90,8 @@ export class LevelRender extends RenderObject {
                 if(sides[1][0] == 1 && sides[0][0] != 1) tile.up.next_left = render_tiles[tile.list_y][tile.list_x-1].up
                 else if(sides[1][0] != 1 && sides[0][0] != 1) tile.up.next_left = tile.left
                 else if(sides[0][0] == 1) tile.up.next_left = render_tiles[tile.list_y-1][tile.list_x-1].right
+            }else{
+                tile.up.useless = true
             }
 
             //Down side
@@ -101,6 +103,8 @@ export class LevelRender extends RenderObject {
                 if(sides[1][2] == 1 && sides[2][2] != 1) tile.down.next_left = render_tiles[tile.list_y][tile.list_x+1].down
                 else if(sides[1][2] != 1 && sides[2][2] != 1) tile.down.next_left = tile.right
                 else if(sides[2][2] == 1) tile.down.next_left = render_tiles[tile.list_y+1][tile.list_x+1].left
+            }else{
+                tile.down.useless = true
             }
 
             //Right side
@@ -112,6 +116,8 @@ export class LevelRender extends RenderObject {
                 if(sides[0][1] == 1 && sides[0][2] != 1) tile.right.next_left = render_tiles[tile.list_y-1][tile.list_x].right
                 else if(sides[0][1] != 1 && sides[0][2] != 1) tile.right.next_left = tile.up
                 else if(sides[0][2] == 1) tile.right.next_left = render_tiles[tile.list_y-1][tile.list_x+1].down
+            }else{
+                tile.right.useless = true
             }
 
             //Left side
@@ -123,6 +129,8 @@ export class LevelRender extends RenderObject {
                 if(sides[2][1] == 1 && sides[2][0] != 1) tile.left.next_left = render_tiles[tile.list_y+1][tile.list_x].left
                 else if(sides[2][1] != 1 && sides[2][0] != 1) tile.left.next_left = tile.down
                 else if(sides[2][0] == 1) tile.left.next_left = render_tiles[tile.list_y+1][tile.list_x-1].up
+            }else{
+                tile.left.useless = true
             }
         }
     }
@@ -206,6 +214,7 @@ class Line {
         this.next_right
         this.next_left
         this.drawComplete = true
+        this.useless = false
     }
 
     update() {

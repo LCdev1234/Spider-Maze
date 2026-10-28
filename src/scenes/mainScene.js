@@ -35,7 +35,7 @@ export default class Main extends Phaser.Scene{
         down: Phaser.Input.Keyboard.KeyCodes.DOWN,
         left: Phaser.Input.Keyboard.KeyCodes.LEFT,
         right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-        jump: Phaser.Input.Keyboard.KeyCodes.SPACE
+        space: Phaser.Input.Keyboard.KeyCodes.SPACE
       }
     )
     this.player = new Player(player_cursors, 60, 60)
@@ -76,7 +76,29 @@ export default class Main extends Phaser.Scene{
       x += 10
       y += 10
       if(!this.level.tile_sprites?.[Math.floor(y / this.level.tile_size)]?.[Math.floor(x / this.level.tile_size)]?.physicsObject.hide) {
-        
+        const tile_x = Math.floor(x/this.level.tile_size)
+        const tile_y = Math.floor(y/this.level.tile_size)
+        const tile = this.level.tile_sprites[tile_y]?.[tile_x]
+
+        if(tile){
+          let dot
+          if(!tile.up.useless) {
+            dot = tile.up.dots[Math.floor(x%(LevelRender.tile_size/2))]
+            dot.speed = Math.max(-5, dot.speed - speed*1.5)
+          }
+          if(!tile.down.useless) {
+            dot = tile.down.dots[tile.down.dots.length-1-Math.floor(x%(LevelRender.tile_size/2))]
+            dot.speed = Math.min(5, dot.speed + speed*1.5)
+          }
+          if(!tile.right.useless) {
+            dot = tile.right.dots[Math.floor(y%(LevelRender.tile_size/2))]
+            dot.speed = Math.min(5, dot.speed + speed*1.5)
+          }
+          if(!tile.left.useless) {
+            dot = tile.left.dots[tile.left.dots.length-1-Math.floor(y%(LevelRender.tile_size/2))]
+            dot.speed = Math.max(-5, dot.speed - speed*1.5)
+          }
+        }
       }else{
         let sides = 
         [

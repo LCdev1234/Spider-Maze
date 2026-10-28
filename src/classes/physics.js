@@ -1,5 +1,6 @@
 import { LevelRender } from "./level"
 import { RigidBody } from "./objects"
+import { Render } from "./render"
 
 export default class Physics {
     static GRAVITY = 0.85
@@ -51,10 +52,11 @@ export default class Physics {
 
     static touchingSolid(bodies, shape) {
         for(let box of bodies){
-            if(box != shape && !box.hide){
+            if(box != shape && (shape.inverse ? box.hide : !box.hide)){
                 if(box.isTouching(shape)) return true
             }
         }
+        if(shape.x < 0 || shape.x+shape.width > Render.width || shape.y < 0 || shape.y+shape.height > Render.height) return true
         return false
     }
 }
