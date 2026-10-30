@@ -102,12 +102,37 @@ export class Rectangle extends RigidBody {
             if(shape.x > this.x &&
                 shape.x < this.x + this.getWidth() &&
                 shape.y > this.y &&
-                shape.y > this.y + this.getHeight()
+                shape.y < this.y + this.getHeight()
             ) {
                 return true
             }else{
                 return false
             }
+        }
+    }
+}
+
+export class Point extends RigidBody {
+    constructor(x, y, state, hide = true){
+        super(x, y, state)
+        this.width = 0
+        this.height = 0
+        this.hide = hide
+    }
+
+    isTouching(shape){
+        if(shape instanceof Rectangle){
+            if(this.x > shape.x &&
+                this.x < shape.x + shape.getWidth() &&
+                this.y > shape.y &&
+                this.y < shape.y + shape.getHeight()
+            ) {
+                return true
+            }else{
+                return false
+            }
+        }else{
+            return false
         }
     }
 }

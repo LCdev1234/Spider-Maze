@@ -73,7 +73,7 @@ export class Render {
         }
     }
 
-    update(x, y) {
+    update(x, y, lights) {
         this.canvas.setPosition((-x-10)*this.canvas.scale + Render.scene.scale.width/2, (-y-10)*this.canvas.scale + Render.scene.scale.height/2)
         this.canvas.clear()
         this.canvas.fill(0xffffff)
@@ -87,19 +87,35 @@ export class Render {
                 this.canvas.render()
             }
         }
-        this.drawLights()
+        this.drawLights(lights)
     }
 
-    drawLights(){
+    drawLights(lights){
         this.light_blinks++
         this.light.clear()
         this.light_graphics.clear()
-        this.light_graphics.fillStyle(0x170101, 1)
+        this.light_graphics.fillStyle(0x0d0303, 1)
         this.light_graphics.fillRect(0, 0, Render.scene.scale.width, Render.scene.scale.height);
         this.light.draw(this.light_graphics, 0, 0)
         this.light.render()
         if(this.light_blinks < 500 || this.light_blinks % 20 < 12 + 5*Math.random()){
             this.light_graphics.clear()
+            if(lights){
+                for(let {x, y} of lights){
+                    this.light_graphics.fillStyle(0xffffff, 0.025)
+                    this.light_graphics.fillCircle(x, y, Render.scene.scale.height/4)
+                    this.light_graphics.fillStyle(0xffffff, 0.07)
+                    this.light_graphics.fillCircle(x, y, 350/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillStyle(0xffffff, 0.05)
+                    this.light_graphics.fillCircle(x, y, 325/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillStyle(0xffffff, 0.1)
+                    this.light_graphics.fillCircle(x, y, 225/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillStyle(0xffffff, 0.1)
+                    this.light_graphics.fillCircle(x, y, 150/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillStyle(0xffffff, 0.4)
+                    this.light_graphics.fillCircle(x, y, 100/400 * Render.scene.scale.height/4)
+                }
+            }
             this.light_graphics.fillStyle(0xffffff, 0.05)
             this.light_graphics.fillCircle(Render.scene.scale.width/2, Render.scene.scale.height/2, Render.scene.scale.height/2.2)
             this.light_graphics.fillStyle(0xffffff, 0.1)

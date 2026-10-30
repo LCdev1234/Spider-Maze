@@ -3,6 +3,7 @@ import Physics from "../classes/physics"
 import Player from "../classes/player"
 import Level, { LevelRender } from "../classes/level"
 import {Render} from "../classes/render"
+import Spider from "../classes/spider"
 
 
 export default class Main extends Phaser.Scene{
@@ -40,6 +41,10 @@ export default class Main extends Phaser.Scene{
     )
     this.player = new Player(player_cursors, 60, 60)
 
+    //Spider
+    const temporaly_pointer = this.input.activePointer
+    this.spider = new Spider(temporaly_pointer)
+
     //Physics
     this.physics = new Physics()
     this.physics.addObject(this.player.hitbox) //Add player
@@ -49,11 +54,11 @@ export default class Main extends Phaser.Scene{
     }
 
     //Render
-    console.log()
     this.render = new Render(this.level.tiles_width*this.level.tile_size, this.level.tiles_height*this.level.tile_size)
     this.render.addObject(...this.level.tile_sprites.flat())
-    this.render.addObject(this.player.sprite) //Add player
-    this.render.addObject(this.player.eye1, this.player.eye2)
+    this.render.addObject(this.spider.sprite) //Add spider
+    this.render.addObject(...this.spider.legs)
+    this.render.addObject(this.player.sprite, this.player.eye1, this.player.eye2) //Add player
   }
 
   update(time, delta){
@@ -71,6 +76,35 @@ export default class Main extends Phaser.Scene{
    
     this.level.update(fpsRatio)
     this.player.update()
+    this.spider.update(this.player.hitbox.x +10, this.player.hitbox.y +10, this.render.canvas.scale)
+    if(this.player.merge_start) 
+    {
+      let x = this.player.hitbox.x
+      let y = this.player.hitbox.y
+      let speed = 200
+      if(!this.level.tile_sprites?.[Math.floor(y / this.level.tile_size)]?.[Math.floor(x / this.level.tile_size)]?.physicsObject.hide) {
+      }else{
+        let sides = 
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ]
+        for(let ny = 0; ny < 3; ny++){
+          for(let nx = 0; nx < 3; nx++){
+            let list_x = Math.floor(x/this.level.tile_size) + (nx -1)
+            let list_y = Math.floor(y/this.level.tile_size) + (ny -1)
+            if(list_x >= 0 && list_y >= 0 && list_y < this.level.tiles.length && list_x < this.level.tiles[list_y].length) {
+              if(this.level.tiles[list_y][list_x] == 1) sides[ny][nx] = this.level.tile_sprites[list_y][list_x]
+              else sides[ny][nx] = -1
+            }else sides[ny][nx] = -1
+          }
+        }
+
+        let dots = sides[2][1].up.dots[Math.floor(x%(LevelRender.tile_size/2))]
+        dots.speed = Math.min(20, dots.speed + speed*2)
+      }
+    }
     const collisionPoints = this.physics.update(fpsRatio)
     for(let {x, y, speed} of collisionPoints){
       x += 10
@@ -161,7 +195,7 @@ export default class Main extends Phaser.Scene{
       }
       
     }
-    this.render.update(this.player.hitbox.x, this.player.hitbox.y)
+    this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.spider.x, y: this.spider.y}])
 
   }
 }

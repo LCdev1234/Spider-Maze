@@ -43,6 +43,7 @@ export default class Player {
         ), 0, 0, this.hitbox)
 
         this.canJump = true
+        this.merge_start = false
     }
 
     update() {
@@ -61,14 +62,13 @@ export default class Player {
         }
 
         if(!this.merge) {
-            this.sprite.hide = false
-            this.hitbox.inverse = false
-            this.hitbox.gravity = Physics.GRAVITY
-            this.hitbox.friction_y = 1
-            this.hitbox.friction_x = Physics.FRICTION
-
-
-
+            if(this.hitbox.inverse == true) {
+                this.sprite.hide = false
+                this.hitbox.inverse = false
+                this.hitbox.gravity = Physics.GRAVITY
+                this.hitbox.friction_y = 1
+                this.hitbox.friction_x = Physics.FRICTION
+            }
 
             const input_x = this.cursors.right.isDown - this.cursors.left.isDown
             const jump = this.cursors.up.isDown
@@ -76,6 +76,7 @@ export default class Player {
             this.hitbox.speed_x += input_x * Player.speed
 
             if(Phaser.Input.Keyboard.JustDown(this.cursors.space) && this.hitbox.inGround){
+                this.merge_start = true
                 this.merge = true
             }
 
@@ -92,11 +93,14 @@ export default class Player {
                 this.hitbox.sliding = 0
             }
         }else{
-            this.sprite.hide = true
-            this.hitbox.inverse = true
-            this.hitbox.gravity = 0
-            this.hitbox.friction_y = Physics.FRICTION
-            this.hitbox.friction_x = Physics.FRICTION
+            this.merge_start = false
+            if(this.hitbox.inverse == false){
+                this.sprite.hide = true
+                this.hitbox.inverse = true
+                this.hitbox.gravity = 0
+                this.hitbox.friction_y = Physics.FRICTION
+                this.hitbox.friction_x = Physics.FRICTION
+            }
 
             const input_x = this.cursors.right.isDown - this.cursors.left.isDown
             const input_y = this.cursors.down.isDown - this.cursors.up.isDown
