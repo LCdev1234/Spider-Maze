@@ -99,7 +99,7 @@ export default class Spider{
             graphics.lineStyle(5, 0x000000, 1);
             let targetX = leg.actualX - leg.x
             let targetY = leg.actualY - leg.y
-            let angle = Math.asin(getDistance(0, 0, targetX, targetY)/6400)
+            let angle = Math.acos(Math.sqrt(getDistance(0, 0, targetX, targetY))/80)
             let normalAngle = getAngle(0, 0, targetX, targetY)
             if(targetX > 0){
                 graphics.lineBetween(0, 0, 0 + 40*Math.cos(normalAngle - angle), 0 + 40*Math.sin(normalAngle - angle));
