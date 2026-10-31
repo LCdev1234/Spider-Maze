@@ -5,6 +5,24 @@ import {Render} from "./render"
 export default class Level {
     static time = 0
 
+    static getLevel(code) {
+        this.tiles = []
+        let line = []
+        for(let tile of code) {
+            if(tile != "\n") {
+                if(tile != "\r"){
+                    if(tile == 1) line.push(1)
+                    else line.push(0)
+                }
+            }else {
+                this.tiles.push(line)
+                line = []
+            }
+        }
+        if(line.length != 0) this.tiles.push(line)
+        return this.tiles
+    }
+
     constructor(code) {
         this.tile_size = 40
         LevelRender.init(this.tile_size)

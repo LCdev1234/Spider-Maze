@@ -13,7 +13,7 @@ export default class Main extends Phaser.Scene{
 
   preload(){
     this.load.text("level1", "src/levels/level1.txt")
-    this.load.text("level2", "src/levels/level2.txt")
+    this.load.text("spider_level", "src/levels/spider_level.txt")
     this.load.image("background", "src/assets/background.png")
   }
 
@@ -25,7 +25,7 @@ export default class Main extends Phaser.Scene{
     this.codes = 
     {
       level1: this.cache.text.get("level1"),
-      level2: this.cache.text.get("level2")
+      spiderLevel: this.cache.text.get("spider_level")
     }
     this.level = new Level(this.codes.level1)
 
@@ -42,8 +42,7 @@ export default class Main extends Phaser.Scene{
     this.player = new Player(player_cursors, 60, 60)
 
     //Spider
-    const temporaly_pointer = this.input.activePointer
-    this.spider = new Spider(temporaly_pointer)
+    this.spider = new Spider(600, 90, Level.getLevel(this.codes.spiderLevel))
 
     //Physics
     this.physics = new Physics()
@@ -76,7 +75,53 @@ export default class Main extends Phaser.Scene{
    
     this.level.update(fpsRatio)
     this.player.update()
-    this.spider.update(this.player.hitbox.x +10, this.player.hitbox.y +10, this.render.canvas.scale)
+    this.spider.move(!(this.player.hitbox.x < 360 && this.player.hitbox.y < 600), this.player.hitbox.x, this.player.hitbox.y)
+    {
+      let tile = {y: Math.floor(this.spider.y / this.level.tile_size), x:Math.floor(this.spider.x / this.level.tile_size)}
+      this.spider.sprite.x = this.spider.x
+      this.spider.sprite.y = this.spider.y
+
+      let changesY = 0
+      if(this.level.tile_sprites[tile.y-1][tile.x].physicsObject.hide == false){
+        this.spider.sprite.y += this.level.tile_size/2
+        changesY++
+      }
+      if(this.level.tile_sprites[tile.y+1][tile.x].physicsObject.hide == false){
+        this.spider.sprite.y -= this.level.tile_size/2
+        changesY++
+      }
+
+      let changesX = 0
+      if(this.level.tile_sprites[tile.y][tile.x+1].physicsObject.hide == false){
+        this.spider.sprite.x -= this.level.tile_size/2
+        changesX++
+      }
+      if(this.level.tile_sprites[tile.y][tile.x-1].physicsObject.hide == false){
+        this.spider.sprite.x += this.level.tile_size/2
+        changesX++
+      }
+
+      if(changesX == 0 && changesY == 0){
+        if(this.level.tile_sprites[tile.y+1][tile.x-1].physicsObject.hide == false){
+          this.spider.sprite.x += this.level.tile_size/2
+          this.spider.sprite.y -= this.level.tile_size/2
+        }
+        if(this.level.tile_sprites[tile.y+1][tile.x+1].physicsObject.hide == false){
+          this.spider.sprite.x -= this.level.tile_size/2
+          this.spider.sprite.y -= this.level.tile_size/2
+        }
+        if(this.level.tile_sprites[tile.y-1][tile.x-1].physicsObject.hide == false){
+          this.spider.sprite.x += this.level.tile_size/2
+          this.spider.sprite.y += this.level.tile_size/2
+        }
+        if(this.level.tile_sprites[tile.y-1][tile.x+1].physicsObject.hide == false){
+          this.spider.sprite.x -= this.level.tile_size/2
+          this.spider.sprite.y += this.level.tile_size/2
+        }
+      }
+    }
+    this.spider.update()
+
     if(this.player.merge_start) 
     {
       let x = this.player.hitbox.x
@@ -101,8 +146,10 @@ export default class Main extends Phaser.Scene{
           }
         }
 
-        let dots = sides[2][1].up.dots[Math.floor(x%(LevelRender.tile_size/2))]
-        dots.speed = Math.min(20, dots.speed + speed*2)
+        if(sides[2][1].up?.dots){
+          let dots = sides[2][1].up.dots[Math.floor(x%(LevelRender.tile_size/2))]
+          dots.speed = Math.min(20, dots.speed + speed*2)
+        }
       }
     }
     const collisionPoints = this.physics.update(fpsRatio)
@@ -195,7 +242,7 @@ export default class Main extends Phaser.Scene{
       }
       
     }
-    this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.spider.x, y: this.spider.y}])
+    this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.render.canvas.x + this.spider.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.spider.sprite.y*this.render.canvas.scale}])
 
   }
 }
