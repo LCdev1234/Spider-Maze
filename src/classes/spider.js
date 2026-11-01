@@ -2,12 +2,18 @@ import { LevelRender } from "./level"
 import { Point, RigidBody } from "./objects"
 import Physics from "./physics"
 import RenderObject, { Render } from "./render"
+import Phaser from "phaser"
 
 
 export default class Spider{
     constructor(x, y, level) {
         this.x = x
         this.y = y
+        this.actualX = x
+        this.actualY = y
+        this.otherFakeX = x
+        this.otherFakeY = y
+        this.moveToPlayer = {x: 0, y: 0}
         this.level = level
 
         this.detectPoint = new Point(0, 0, RigidBody.STATE.SOLID)
@@ -109,16 +115,19 @@ export default class Spider{
 
         if(this.path){
             if(!this.current) this.current = 0
-            
+            let speed
+            const sqrt_distance = Math.sqrt(distanceToPlayer)
+            if(sqrt_distance > 400){
+                speed = 30
+            }else if(sqrt_distance > 150){
+                speed = 4.5
+            }else {
+                speed = 3
+            }
             if(this.path.length > 1){
-                let speed
-                if(Math.sqrt(distanceToPlayer) > 400){
-                    speed = 30
-                }else if(Math.sqrt(distanceToPlayer) > 100){
-                    speed = 4
-                }else{
-                    speed = 3
-                }
+                this.moveToPlayer.x = Phaser.Math.Linear(this.moveToPlayer.x, 0, 0.2)
+                this.moveToPlayer.y = Phaser.Math.Linear(this.moveToPlayer.y, 0, 0.2)
+
                 if(this.path[this.current].x == this.x && this.path[this.current].y == this.y) {
                     if(this.current == 1){
                         this.path = undefined
@@ -142,14 +151,34 @@ export default class Spider{
                     //this.sprite.y = this.y
                 }
             }else {
-                this.path = undefined
-                this.current = 0
-                this.isPath = true
+                if(this.x < this.path[0].x) {
+                    this.x += Math.min(speed, this.path[0].x - this.x)
+                }else{
+                    this.x -= Math.min(speed, this.x - this.path[0].x)
+                }
+                if(this.y < this.path[0].y) {
+                    this.y += Math.min(speed, this.path[0].y - this.y)
+                }else{
+                    this.y -= Math.min(speed, this.y - this.path[0].y)
+                }
+                if(this.path[0].x == this.x && this.path[0].y == this.y) {
+                    if(findPlayer){
+                        this.moveToPlayer.x = Phaser.Math.Linear(this.moveToPlayer.x, x+10 - this.x, 0.2)
+                        this.moveToPlayer.y = Phaser.Math.Linear(this.moveToPlayer.y, y+10 - this.y, 0.2)
+                    }
+                    this.current = 0
+                    this.isPath = true
+                }
             }
         }
     }
 
     update(){
+        this.otherFakeX = Phaser.Math.Linear(this.otherFakeX, this.actualX, 0.3)
+        this.otherFakeY = Phaser.Math.Linear(this.otherFakeY, this.actualY, 0.3)
+        this.sprite.x = this.otherFakeX + this.moveToPlayer.x
+        this.sprite.y = this.otherFakeY + this.moveToPlayer.y
+        
         let positions = new Set()
         for(let a = 0; a < 360; a += 360/32) {
             let distance = 5

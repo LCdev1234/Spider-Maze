@@ -17,9 +17,18 @@ export default class Main extends Phaser.Scene{
     this.load.image("background", "src/assets/background.png")
   }
 
+  init(){
+
+  }
+
   create(){
     //Initialize render
     Render.init(this)
+
+    this.events.on("resume", (data) => {
+        this.input.setDefaultCursor("none")
+    })
+    this.input.setDefaultCursor("none")
 
     //Levels
     this.codes = 
@@ -104,51 +113,55 @@ export default class Main extends Phaser.Scene{
     this.level.update(fpsRatio)
     this.player.update()
     if(this.player.win){
-      this.player.hitbox.x += (this.winorb.x - this.player.hitbox.x)/10
-      this.player.hitbox.y += (this.winorb.y - this.player.hitbox.y)/10
+      this.player.hitbox.x += (this.winorb.x - (this.player.hitbox.x+10))/10
+      this.player.hitbox.y += (this.winorb.y - (this.player.hitbox.y+10))/10
+      if(Math.abs(getDistance(this.player.hitbox.x+10, this.player.hitbox.y+10, this.winorb.x, this.winorb.y)) < 10) {
+        this.scene.pause()
+        this.scene.launch("WinScene")
+      }
     }
     this.spider.move(!(this.player.hitbox.x < 360 && this.player.hitbox.y < 600) && !this.player.win, this.player.hitbox.x, this.player.hitbox.y)
     {
       let tile = {y: Math.floor(this.spider.y / this.level.tile_size), x:Math.floor(this.spider.x / this.level.tile_size)}
-      this.spider.sprite.x = this.spider.x
-      this.spider.sprite.y = this.spider.y
+      this.spider.actualX = this.spider.x
+      this.spider.actualY = this.spider.y
 
       let changesY = 0
       if(this.level.tile_sprites[tile.y-1][tile.x].physicsObject.hide == false){
-        this.spider.sprite.y += this.level.tile_size/2
+        this.spider.actualY += this.level.tile_size/2
         changesY++
       }
       if(this.level.tile_sprites[tile.y+1][tile.x].physicsObject.hide == false){
-        this.spider.sprite.y -= this.level.tile_size/2
+        this.spider.actualY -= this.level.tile_size/2
         changesY++
       }
 
       let changesX = 0
       if(this.level.tile_sprites[tile.y][tile.x+1].physicsObject.hide == false){
-        this.spider.sprite.x -= this.level.tile_size/2
+        this.spider.actualX -= this.level.tile_size/2
         changesX++
       }
       if(this.level.tile_sprites[tile.y][tile.x-1].physicsObject.hide == false){
-        this.spider.sprite.x += this.level.tile_size/2
+        this.spider.actualX += this.level.tile_size/2
         changesX++
       }
 
       if(changesX == 0 && changesY == 0){
         if(this.level.tile_sprites[tile.y+1][tile.x-1].physicsObject.hide == false){
-          this.spider.sprite.x += this.level.tile_size/2
-          this.spider.sprite.y -= this.level.tile_size/2
+          this.spider.actualX += this.level.tile_size/2
+          this.spider.actualY -= this.level.tile_size/2
         }
         if(this.level.tile_sprites[tile.y+1][tile.x+1].physicsObject.hide == false){
-          this.spider.sprite.x -= this.level.tile_size/2
-          this.spider.sprite.y -= this.level.tile_size/2
+          this.spider.actualX -= this.level.tile_size/2
+          this.spider.actualY -= this.level.tile_size/2
         }
         if(this.level.tile_sprites[tile.y-1][tile.x-1].physicsObject.hide == false){
-          this.spider.sprite.x += this.level.tile_size/2
-          this.spider.sprite.y += this.level.tile_size/2
+          this.spider.actualX += this.level.tile_size/2
+          this.spider.actualY += this.level.tile_size/2
         }
         if(this.level.tile_sprites[tile.y-1][tile.x+1].physicsObject.hide == false){
-          this.spider.sprite.x -= this.level.tile_size/2
-          this.spider.sprite.y += this.level.tile_size/2
+          this.spider.actualX -= this.level.tile_size/2
+          this.spider.actualY += this.level.tile_size/2
         }
       }
     }
@@ -290,21 +303,27 @@ export default class Main extends Phaser.Scene{
     }
 
     this.winorb.update(delta)
+    this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.render.canvas.x + this.spider.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.spider.sprite.y*this.render.canvas.scale, scale: 4}, {x: this.render.canvas.x + this.winorb.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.winorb.sprite.y*this.render.canvas.scale, scale: 2}])
     if(!this.player.merge && Math.abs(Math.sqrt(getDistance(this.player.hitbox.x, this.player.hitbox.y, this.winorb.x, this.winorb.y))) < 200){
       this.player.win = true
       this.player.input_pause = true
       this.player.hitbox.gravity = 0
       this.player.hitbox.speed_y = 0
       this.player.hitbox.speed_x = 0
-    }else if(Math.abs(Math.sqrt(getDistance(this.player.hitbox.x, this.player.hitbox.y, this.spider.x, this.spider.y))) < 20 && !this.player.merge && !this.player.win) {
+    }else if(Math.abs(Math.sqrt(getDistance(this.player.hitbox.x+10, this.player.hitbox.y+10, this.spider.sprite.x, this.spider.sprite.y))) < 40 && !this.player.merge && !this.player.win) {
       //Player dead
-      //this.scene.pause();
-      this.scene.launch("DeadScene");
-      //this.player.hitbox.x = 60
-      //this.player.hitbox.y = 570
+      this.player.input_pause = true
+      this.scene.launch("DeadScene")
+      this.scene.pause("scene-game")
+      this.player.hitbox.x = 60
+      this.player.hitbox.y = 570
+      this.player.hitbox.speed_y = 0
+      this.player.hitbox.speed_x = 0
+      this.player.input_pause = false
+      this.player.respawn = 100
+      this.coldown = 0
+      this.player.canMerge = true
     }
-    this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.render.canvas.x + this.spider.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.spider.sprite.y*this.render.canvas.scale, scale: 4}, {x: this.render.canvas.x + this.winorb.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.winorb.sprite.y*this.render.canvas.scale, scale: 2}])
-
   }
 }
 

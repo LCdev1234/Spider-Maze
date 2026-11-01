@@ -18,6 +18,7 @@ export default class Player {
         this.hitbox.tag = "player"
         this.hitboxHeight = this.hitbox.getHeight()
         this.merge = false
+        this.respawn = 0
         
         this.sprite = new RenderObject(Render.scene.add.rectangle(
             0,
@@ -51,6 +52,13 @@ export default class Player {
     }
 
     update() {
+        if(this.respawn > 0) {
+            if(this.respawn%20 < 10) this.sprite.object.setAlpha(0.25)
+            else this.sprite.object.setAlpha(1)
+            this.respawn--
+        }else{
+            this.sprite.object.setAlpha(1)
+        }
         this.eye_timer++
         if(this.eye_timer > 90){
             this.eye1.object.height = 1

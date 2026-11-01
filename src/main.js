@@ -1,6 +1,8 @@
 import './style.css'
 import Phaser from "phaser"
 import Main from "./scenes/mainScene"
+import DeadScene from "./scenes/deadScene"
+import WinScene from './scenes/winScene'
 
 const config = {
   type: Phaser.WEBGL,
@@ -10,7 +12,7 @@ const config = {
       width: "100%",
       height: "100%",
   },
-  scene:[Main],
+  scene:[Main, DeadScene, WinScene]
 }
 
 const game = new Phaser.Game(config)
