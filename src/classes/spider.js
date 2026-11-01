@@ -113,11 +113,11 @@ export default class Spider{
             if(this.path.length > 1){
                 let speed
                 if(Math.sqrt(distanceToPlayer) > 400){
-                    speed = 20
+                    speed = 30
                 }else if(Math.sqrt(distanceToPlayer) > 100){
-                    speed = 4.5
-                }else{
                     speed = 4
+                }else{
+                    speed = 3
                 }
                 if(this.path[this.current].x == this.x && this.path[this.current].y == this.y) {
                     if(this.current == 1){

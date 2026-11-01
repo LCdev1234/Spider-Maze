@@ -101,19 +101,19 @@ export class Render {
         if(this.light_blinks < 500 || this.light_blinks % 20 < 12 + 5*Math.random()){
             this.light_graphics.clear()
             if(lights){
-                for(let {x, y} of lights){
+                for(let {x, y, scale} of lights){
                     this.light_graphics.fillStyle(0xffffff, 0.025)
-                    this.light_graphics.fillCircle(x, y, Render.scene.scale.height/4)
+                    this.light_graphics.fillCircle(x, y, Render.scene.scale.height/scale)
                     this.light_graphics.fillStyle(0xffffff, 0.07)
-                    this.light_graphics.fillCircle(x, y, 350/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillCircle(x, y, 350/400 * Render.scene.scale.height/scale)
                     this.light_graphics.fillStyle(0xffffff, 0.05)
-                    this.light_graphics.fillCircle(x, y, 325/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillCircle(x, y, 325/400 * Render.scene.scale.height/scale)
                     this.light_graphics.fillStyle(0xffffff, 0.1)
-                    this.light_graphics.fillCircle(x, y, 225/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillCircle(x, y, 225/400 * Render.scene.scale.height/scale)
                     this.light_graphics.fillStyle(0xffffff, 0.1)
-                    this.light_graphics.fillCircle(x, y, 150/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillCircle(x, y, 150/400 * Render.scene.scale.height/scale)
                     this.light_graphics.fillStyle(0xffffff, 0.4)
-                    this.light_graphics.fillCircle(x, y, 100/400 * Render.scene.scale.height/4)
+                    this.light_graphics.fillCircle(x, y, 100/400 * Render.scene.scale.height/scale)
                 }
             }
             this.light_graphics.fillStyle(0xffffff, 0.05)

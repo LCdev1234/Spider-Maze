@@ -9,6 +9,8 @@ export default class Player {
     static speed = 1.6
 
     constructor(cursors, x, y) {
+        this.win = false
+        this.input_pause = false
         this.cursors = cursors
         this.x = x
         this.y = y
@@ -44,6 +46,8 @@ export default class Player {
 
         this.canJump = true
         this.merge_start = false
+        this.merge_end = false
+        this.canMerge = true
     }
 
     update() {
@@ -62,6 +66,7 @@ export default class Player {
         }
 
         if(!this.merge) {
+            this.merge_end = false
             if(this.hitbox.inverse == true) {
                 this.sprite.hide = false
                 this.hitbox.inverse = false
@@ -73,20 +78,21 @@ export default class Player {
             const input_x = this.cursors.right.isDown - this.cursors.left.isDown
             const jump = this.cursors.up.isDown
             //const input_y = this.cursors.down.isDown - this.cursors.up.isDown
-            this.hitbox.speed_x += input_x * Player.speed
+            if(!this.input_pause) this.hitbox.speed_x += input_x * Player.speed
 
-            if(Phaser.Input.Keyboard.JustDown(this.cursors.space) && this.hitbox.inGround){
+            if(Phaser.Input.Keyboard.JustDown(this.cursors.space) && this.hitbox.inGround && !this.input_pause && this.canMerge){
                 this.merge_start = true
                 this.merge = true
+                this.canMerge = false
             }
 
-            if(this.canJump && jump && this.hitbox.inGround) {
+            if(this.canJump && jump && this.hitbox.inGround && !this.input_pause) {
                 this.hitbox.speed_y += -13
                 this.canJump = false
                 Phaser.Input.Keyboard.JustDown(this.cursors.up)
             }else if(this.hitbox.inGround) this.canJump = true
 
-            if(this.hitbox.sliding > 0 && Phaser.Input.Keyboard.JustDown(this.cursors.up)){
+            if(this.hitbox.sliding > 0 && Phaser.Input.Keyboard.JustDown(this.cursors.up) && !this.input_pause){
                 this.hitbox.speed_y += -10
                 if(input_x == this.hitbox.sliding_x) this.hitbox.speed_x *= 0.9
                 else this.hitbox.speed_x += this.hitbox.sliding_x * 15
@@ -105,11 +111,14 @@ export default class Player {
             const input_x = this.cursors.right.isDown - this.cursors.left.isDown
             const input_y = this.cursors.down.isDown - this.cursors.up.isDown
 
-            this.hitbox.speed_x += input_x
-            this.hitbox.speed_y += input_y
+            if(!this.input_pause) {
+                this.hitbox.speed_x += input_x
+                this.hitbox.speed_y += input_y
+            }
 
             if(Phaser.Input.Keyboard.JustDown(this.cursors.space)){
                 this.merge = false
+                this.merge_end = true
             }
         }
     }

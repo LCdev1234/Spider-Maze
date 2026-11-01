@@ -2,7 +2,7 @@ import Phaser from "phaser"
 import Physics from "../classes/physics"
 import Player from "../classes/player"
 import Level, { LevelRender } from "../classes/level"
-import {Render} from "../classes/render"
+import RenderObject, {Render} from "../classes/render"
 import Spider from "../classes/spider"
 
 
@@ -39,10 +39,35 @@ export default class Main extends Phaser.Scene{
         space: Phaser.Input.Keyboard.KeyCodes.SPACE
       }
     )
-    this.player = new Player(player_cursors, 60, 60)
+    this.player = new Player(player_cursors, 60, 570)
+    this.player.input_pause = false
+    this.timerText = this.add.text(20, this.scale.height-20, '0', {
+        fontFamily: 'Fredoka',
+        fontSize: '64px',
+        fontStyle: 'bold',
+        color: '#ffffff'
+    }).setDepth(100).setOrigin(0, 1)
+    this.coldown = 0
+    this.timer = this.time.addEvent({
+          delay: 1000,
+          callback: () => {
+            if(this.coldown > 0){
+              this.coldown--
+              this.timerText.setText(this.coldown)
+              if(this.coldown == 0) this.player.canMerge = true
+            }else{
+              this.timerText.setText("")
+            }
+          },
+          callbackScope: this,
+          loop: true
+      });
 
     //Spider
     this.spider = new Spider(600, 90, Level.getLevel(this.codes.spiderLevel))
+
+    //WinOrb
+    this.winorb = new WinOrb(2350, 1350)
 
     //Physics
     this.physics = new Physics()
@@ -57,6 +82,7 @@ export default class Main extends Phaser.Scene{
     this.render.addObject(...this.level.tile_sprites.flat())
     this.render.addObject(this.spider.sprite) //Add spider
     this.render.addObject(...this.spider.legs)
+    this.render.addObject(this.winorb.sprite)
     this.render.addObject(this.player.sprite, this.player.eye1, this.player.eye2) //Add player
   }
 
@@ -64,6 +90,8 @@ export default class Main extends Phaser.Scene{
     //Adjust movement per time
     const fps = 1000/delta
     const fpsRatio = Math.min(60 / fps, 2)
+    this.timerText.setPosition(20, this.scale.height-20)
+    this.timerText.setScale(this.render.canvas.scale/2)
 
     //Updates
     for(let lines of this.level.tile_sprites.flat()){
@@ -75,7 +103,11 @@ export default class Main extends Phaser.Scene{
    
     this.level.update(fpsRatio)
     this.player.update()
-    this.spider.move(!(this.player.hitbox.x < 360 && this.player.hitbox.y < 600), this.player.hitbox.x, this.player.hitbox.y)
+    if(this.player.win){
+      this.player.hitbox.x += (this.winorb.x - this.player.hitbox.x)/10
+      this.player.hitbox.y += (this.winorb.y - this.player.hitbox.y)/10
+    }
+    this.spider.move(!(this.player.hitbox.x < 360 && this.player.hitbox.y < 600) && !this.player.win, this.player.hitbox.x, this.player.hitbox.y)
     {
       let tile = {y: Math.floor(this.spider.y / this.level.tile_size), x:Math.floor(this.spider.x / this.level.tile_size)}
       this.spider.sprite.x = this.spider.x
@@ -124,6 +156,16 @@ export default class Main extends Phaser.Scene{
 
     if(this.player.merge_start) 
     {
+      this.unmerge = this.time.addEvent({
+          delay: 3000,
+          callback: () => {
+            this.player.merge = false
+            this.coldown = 10
+            this.unmerge.remove();
+          },
+          callbackScope: this,
+          loop: true
+      });
       let x = this.player.hitbox.x
       let y = this.player.hitbox.y
       let speed = 200
@@ -151,6 +193,10 @@ export default class Main extends Phaser.Scene{
           dots.speed = Math.min(20, dots.speed + speed*2)
         }
       }
+    }else if(this.player.merge_end){
+      this.unmerge.remove()
+      this.player.merge = false
+      this.coldown = 10
     }
     const collisionPoints = this.physics.update(fpsRatio)
     for(let {x, y, speed} of collisionPoints){
@@ -242,7 +288,22 @@ export default class Main extends Phaser.Scene{
       }
       
     }
-    this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.render.canvas.x + this.spider.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.spider.sprite.y*this.render.canvas.scale}])
+
+    this.winorb.update(delta)
+    if(!this.player.merge && Math.abs(Math.sqrt(getDistance(this.player.hitbox.x, this.player.hitbox.y, this.winorb.x, this.winorb.y))) < 200){
+      this.player.win = true
+      this.player.input_pause = true
+      this.player.hitbox.gravity = 0
+      this.player.hitbox.speed_y = 0
+      this.player.hitbox.speed_x = 0
+    }else if(Math.abs(Math.sqrt(getDistance(this.player.hitbox.x, this.player.hitbox.y, this.spider.x, this.spider.y))) < 20 && !this.player.merge && !this.player.win) {
+      //Player dead
+      //this.scene.pause();
+      this.scene.launch("DeadScene");
+      //this.player.hitbox.x = 60
+      //this.player.hitbox.y = 570
+    }
+    this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.render.canvas.x + this.spider.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.spider.sprite.y*this.render.canvas.scale, scale: 4}, {x: this.render.canvas.x + this.winorb.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.winorb.sprite.y*this.render.canvas.scale, scale: 2}])
 
   }
 }
@@ -250,4 +311,30 @@ export default class Main extends Phaser.Scene{
 function getDistance(x1, y1, x2, y2){
   if(!x1 || !y1 || !x2 || !y2) return 1000000000
   return (x2-x1)**2 + (y2-y1)**2
+}
+
+class WinOrb {
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+
+    this.radius = 100
+    this.time = 0
+
+    this.sprite = new RenderObject(
+      Render.scene.add.circle(0, 0, this.radius, 0xffffff),
+      this.x,
+      this.y
+    );
+  }
+
+  update(delta) {
+    this.time += delta;
+
+    const breathing = Math.sin(this.time * 0.002)
+
+    const newRadius = this.radius + breathing * 10
+
+    this.sprite.object.setRadius(newRadius)
+  }
 }
