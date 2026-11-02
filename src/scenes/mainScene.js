@@ -17,8 +17,8 @@ export default class Main extends Phaser.Scene{
     this.load.image("background", "src/assets/background.png")
   }
 
-  init(){
-
+  init(data){
+    this.tutorial = data.tutorial == true
   }
 
   create(){
@@ -322,6 +322,12 @@ export default class Main extends Phaser.Scene{
       this.player.respawn = 100
       this.coldown = 0
       this.player.canMerge = true
+    }
+
+    if(!this.tutorial) {
+      this.tutorial = true
+      this.scene.pause()
+      this.scene.launch("TutorialScene")
     }
   }
 }

@@ -30,7 +30,7 @@ export default class WinScene extends Phaser.Scene {
         this.button_background.on('pointerdown', () => {
             this.button.setScale(0.9, 0.9)
             this.scene.stop()
-            this.scene.start("scene-game")
+            this.scene.start("scene-game", {tutorial: true})
             this.input.setDefaultCursor('default')
         })
         this.button_background.on('pointerover', () => {
