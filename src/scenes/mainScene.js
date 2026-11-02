@@ -97,8 +97,7 @@ export default class Main extends Phaser.Scene{
 
   update(time, delta){
     //Adjust movement per time
-    const fps = 1000/delta
-    const fpsRatio = Math.min(60 / fps, 2)
+    const fpsRatio = delta / (1000 / 60)
     this.timerText.setPosition(20, this.scale.height-20)
     this.timerText.setScale(this.render.canvas.scale/2)
 
@@ -111,16 +110,16 @@ export default class Main extends Phaser.Scene{
     }
    
     this.level.update(fpsRatio)
-    this.player.update()
+    this.player.update(fpsRatio)
     if(this.player.win){
-      this.player.hitbox.x += (this.winorb.x - (this.player.hitbox.x+10))/10
-      this.player.hitbox.y += (this.winorb.y - (this.player.hitbox.y+10))/10
+      this.player.hitbox.x += (this.winorb.x - (this.player.hitbox.x+10))/10 * fpsRatio
+      this.player.hitbox.y += (this.winorb.y - (this.player.hitbox.y+10))/10 * fpsRatio
       if(Math.abs(getDistance(this.player.hitbox.x+10, this.player.hitbox.y+10, this.winorb.x, this.winorb.y)) < 10) {
         this.scene.pause()
         this.scene.launch("WinScene")
       }
     }
-    this.spider.move(!(this.player.hitbox.x < 360 && this.player.hitbox.y < 600) && !this.player.win, this.player.hitbox.x, this.player.hitbox.y)
+    this.spider.move(!(this.player.hitbox.x < 360 && this.player.hitbox.y < 600) && !this.player.win, this.player.hitbox.x, this.player.hitbox.y, fpsRatio)
     {
       let tile = {y: Math.floor(this.spider.y / this.level.tile_size), x:Math.floor(this.spider.x / this.level.tile_size)}
       this.spider.actualX = this.spider.x
@@ -165,7 +164,7 @@ export default class Main extends Phaser.Scene{
         }
       }
     }
-    this.spider.update()
+    this.spider.update(fpsRatio)
 
     if(this.player.merge_start) 
     {

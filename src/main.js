@@ -7,6 +7,11 @@ import WinScene from './scenes/winScene'
 const config = {
   type: Phaser.WEBGL,
   canvas: gameCanvas,
+  fps: {
+    target: 60,
+    forceSetTimeOut: false,
+    smoothStep: false
+  },
   scale: {
       mode: Phaser.Scale.RESIZE,
       width: "100%",

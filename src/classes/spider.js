@@ -44,7 +44,7 @@ export default class Spider{
         this.lastChangeY = 0
     }
 
-    move(findPlayer, x, y){
+    move(findPlayer, x, y, fpsRatio){
         const distanceToPlayer = getDistance(this.x, this.y, x, y)
         //Path finding
         if(findPlayer && this.isPath) {
@@ -138,28 +138,28 @@ export default class Spider{
                     }
                 }else{
                     if(this.x < this.path[this.current].x) {
-                        this.x += Math.min(speed, this.path[this.current].x - this.x)
+                        this.x += Math.min(speed*fpsRatio, this.path[this.current].x - this.x)
                     }else{
-                        this.x -= Math.min(speed, this.x - this.path[this.current].x)
+                        this.x -= Math.min(speed*fpsRatio, this.x - this.path[this.current].x)
                     }
                     if(this.y < this.path[this.current].y) {
-                        this.y += Math.min(speed, this.path[this.current].y - this.y)
+                        this.y += Math.min(speed*fpsRatio, this.path[this.current].y - this.y)
                     }else{
-                        this.y -= Math.min(speed, this.y - this.path[this.current].y)
+                        this.y -= Math.min(speed*fpsRatio, this.y - this.path[this.current].y)
                     }
                     //this.sprite.x = this.x
                     //this.sprite.y = this.y
                 }
             }else {
                 if(this.x < this.path[0].x) {
-                    this.x += Math.min(speed, this.path[0].x - this.x)
+                    this.x += Math.min(speed*fpsRatio, this.path[0].x - this.x)
                 }else{
-                    this.x -= Math.min(speed, this.x - this.path[0].x)
+                    this.x -= Math.min(speed*fpsRatio, this.x - this.path[0].x)
                 }
                 if(this.y < this.path[0].y) {
-                    this.y += Math.min(speed, this.path[0].y - this.y)
+                    this.y += Math.min(speed*fpsRatio, this.path[0].y - this.y)
                 }else{
-                    this.y -= Math.min(speed, this.y - this.path[0].y)
+                    this.y -= Math.min(speed*fpsRatio, this.y - this.path[0].y)
                 }
                 if(this.path[0].x == this.x && this.path[0].y == this.y) {
                     if(findPlayer){
@@ -173,7 +173,7 @@ export default class Spider{
         }
     }
 
-    update(){
+    update(fpsRatio){
         this.otherFakeX = Phaser.Math.Linear(this.otherFakeX, this.actualX, 0.3)
         this.otherFakeY = Phaser.Math.Linear(this.otherFakeY, this.actualY, 0.3)
         this.sprite.x = this.otherFakeX + this.moveToPlayer.x
@@ -232,8 +232,8 @@ export default class Spider{
             let animationDistance = Math.sqrt(getDistance(leg.targetX, leg.targetY, leg.actualX, leg.actualY))
             if(Math.abs(animationDistance) > 5){
                 let angle = getAngle(leg.actualX, leg.actualY, leg.targetX, leg.targetY)
-                leg.actualX += Math.min(15, animationDistance) * Math.cos(angle)
-                leg.actualY += Math.min(15, animationDistance) * Math.sin(angle)
+                leg.actualX += Math.min(15*fpsRatio, animationDistance) * Math.cos(angle)
+                leg.actualY += Math.min(15*fpsRatio, animationDistance) * Math.sin(angle)
             }
             let graphics = leg.object
             graphics.clear()

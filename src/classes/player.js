@@ -51,7 +51,7 @@ export default class Player {
         this.canMerge = true
     }
 
-    update() {
+    update(fpsRatio) {
         if(this.respawn > 0) {
             if(this.respawn%20 < 10) this.sprite.object.setAlpha(0.25)
             else this.sprite.object.setAlpha(1)
@@ -86,7 +86,7 @@ export default class Player {
             const input_x = this.cursors.right.isDown - this.cursors.left.isDown
             const jump = this.cursors.up.isDown
             //const input_y = this.cursors.down.isDown - this.cursors.up.isDown
-            if(!this.input_pause) this.hitbox.speed_x += input_x * Player.speed
+            if(!this.input_pause) this.hitbox.speed_x += input_x * Player.speed * fpsRatio
 
             if(Phaser.Input.Keyboard.JustDown(this.cursors.space) && this.hitbox.inGround && !this.input_pause && this.canMerge){
                 this.merge_start = true
@@ -120,8 +120,8 @@ export default class Player {
             const input_y = this.cursors.down.isDown - this.cursors.up.isDown
 
             if(!this.input_pause) {
-                this.hitbox.speed_x += input_x
-                this.hitbox.speed_y += input_y
+                this.hitbox.speed_x += input_x * fpsRatio
+                this.hitbox.speed_y += input_y * fpsRatio
             }
 
             if(Phaser.Input.Keyboard.JustDown(this.cursors.space)){

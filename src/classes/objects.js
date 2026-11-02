@@ -30,13 +30,17 @@ export class RigidBody {
 
     update(fpsRatio) {
         if(this.state == RigidBody.STATE.MOVING){
-            this.speed_x *= this.friction_x
-            this.speed_y *= this.friction_y
-            this.speed_y += this.gravity
+            this.speed_x *= this.friction_x**fpsRatio
+            this.speed_y *= this.friction_y**fpsRatio
+            if(fpsRatio > 1){
+                this.speed_y += this.gravity*fpsRatio*0.9
+            }else{
+                this.speed_y += this.gravity*fpsRatio
+            }
             
             let last_x = this.x
             for(let add = 0; add < 20; add++){
-                this.x += this.speed_x/20
+                this.x += this.speed_x/20*fpsRatio
                 if(Physics.touchingSolid(Physics.bodies, this)) break
             }
             //this.x += this.speed_x
@@ -52,12 +56,12 @@ export class RigidBody {
                 this.speed_x = 0
             }
             if(this.speed_y > 0 && this.sliding > 0 && !this.inverse){
-                this.speed_y *= 0.5
+                this.speed_y *= 0.5**fpsRatio
             }
             this.x = last_x
             //this.y += this.speed_y
             for(let add = 0; add < 20; add++){
-                this.y += this.speed_y/20
+                this.y += this.speed_y/20*fpsRatio
                 if(Physics.touchingSolid(Physics.bodies, this)) break
             }
             if(Physics.touchingSolid(Physics.bodies, this)){
