@@ -4,9 +4,6 @@ export default class TutorialScene extends Phaser.Scene {
     constructor(){
         super("TutorialScene")
     }
-    preload(){
-        this.load.font("Nosifer", "src/assets/Nosifer-Regular.ttf")
-    }
     create(){
         this.input.setDefaultCursor('default')
 

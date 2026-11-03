@@ -12,14 +12,14 @@ export default class Main extends Phaser.Scene{
   }
 
   preload(){
-    this.load.text("level1", "src/levels/level1.txt")
-    this.load.text("spider_level", "src/levels/spider_level.txt")
-    this.load.image("background", "src/assets/background.png")
+    this.load.text("level1", "./levels/level1.txt")
+    this.load.text("spider_level", "./levels/spider_level.txt")
+    this.load.image("background", "./assets/background.png")
 
-    this.load.audio("background_music", "src/assets/background_music.mp3")
-    this.load.audio("spider_footsteps", "src/assets/spider_footsteps.mp3")
-    this.load.audio("spider_scream", "src/assets/insect_scream.mp3")
-    this.load.audio("win_sound", "src/assets/win.mp3")
+    this.load.audio("background_music", "./assets/background_music.mp3")
+    this.load.audio("spider_footsteps", "./assets/spider_footsteps.mp3")
+    this.load.audio("spider_scream", "./assets/insect_scream.mp3")
+    this.load.audio("win_sound", "./assets/win.mp3")
   }
 
   init(data){

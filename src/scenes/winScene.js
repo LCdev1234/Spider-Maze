@@ -5,7 +5,7 @@ export default class WinScene extends Phaser.Scene {
         super("WinScene")
     }
     preload(){
-        this.load.font("Nosifer", "src/assets/Nosifer-Regular.ttf")
+        this.load.font("Nosifer", "./assets/Nosifer-Regular.ttf")
     }
     create(){
         this.input.setDefaultCursor('default')
