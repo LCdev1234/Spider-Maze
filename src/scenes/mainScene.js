@@ -15,6 +15,11 @@ export default class Main extends Phaser.Scene{
     this.load.text("level1", "src/levels/level1.txt")
     this.load.text("spider_level", "src/levels/spider_level.txt")
     this.load.image("background", "src/assets/background.png")
+
+    this.load.audio("background_music", "src/assets/background_music.mp3")
+    this.load.audio("spider_footsteps", "src/assets/spider_footsteps.mp3")
+    this.load.audio("spider_scream", "src/assets/insect_scream.mp3")
+    this.load.audio("win_sound", "src/assets/win.mp3")
   }
 
   init(data){
@@ -22,6 +27,14 @@ export default class Main extends Phaser.Scene{
   }
 
   create(){
+    //Background music
+    this.background_music = this.sound.add("background_music", {loop: true, volume: 0.1})
+    this.background_music.play()
+    //Music
+    this.spider_footsteps = this.sound.add("spider_footsteps", {volume: 0.5})
+    this.spider_scream = this.sound.add("spider_scream", {volume: 0.5})
+    this.win_sound = this.sound.add("win_sound", {volume: 0.4})
+
     //Initialize render
     Render.init(this)
 
@@ -73,7 +86,7 @@ export default class Main extends Phaser.Scene{
       });
 
     //Spider
-    this.spider = new Spider(600, 90, Level.getLevel(this.codes.spiderLevel))
+    this.spider = new Spider(600, 90, Level.getLevel(this.codes.spiderLevel), this.spider_footsteps, this.spider_scream)
 
     //WinOrb
     this.winorb = new WinOrb(2350, 1350)
@@ -303,12 +316,14 @@ export default class Main extends Phaser.Scene{
 
     this.winorb.update(delta)
     this.render.update(this.player.hitbox.x, this.player.hitbox.y, [{x: this.render.canvas.x + this.spider.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.spider.sprite.y*this.render.canvas.scale, scale: 4}, {x: this.render.canvas.x + this.winorb.sprite.x*this.render.canvas.scale, y: this.render.canvas.y + this.winorb.sprite.y*this.render.canvas.scale, scale: 2}])
-    if(!this.player.merge && Math.abs(Math.sqrt(getDistance(this.player.hitbox.x, this.player.hitbox.y, this.winorb.x, this.winorb.y))) < 200){
+    if(!this.player.win && !this.player.merge && Math.abs(Math.sqrt(getDistance(this.player.hitbox.x, this.player.hitbox.y, this.winorb.x, this.winorb.y))) < 200){
       this.player.win = true
       this.player.input_pause = true
       this.player.hitbox.gravity = 0
       this.player.hitbox.speed_y = 0
       this.player.hitbox.speed_x = 0
+      this.win_sound.play()
+      this.background_music.stop()
     }else if(Math.abs(Math.sqrt(getDistance(this.player.hitbox.x+10, this.player.hitbox.y+10, this.spider.sprite.x, this.spider.sprite.y))) < 40 && !this.player.merge && !this.player.win) {
       //Player dead
       this.player.input_pause = true

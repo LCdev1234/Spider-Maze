@@ -6,7 +6,7 @@ import Phaser from "phaser"
 
 
 export default class Spider{
-    constructor(x, y, level) {
+    constructor(x, y, level, walk_sound, scream_sound) {
         this.x = x
         this.y = y
         this.actualX = x
@@ -15,6 +15,10 @@ export default class Spider{
         this.otherFakeY = y
         this.moveToPlayer = {x: 0, y: 0}
         this.level = level
+
+        this.walk_sound = walk_sound
+        this.scream_sound = scream_sound
+        this.scream = false
 
         this.detectPoint = new Point(0, 0, RigidBody.STATE.SOLID)
 
@@ -119,10 +123,22 @@ export default class Spider{
             const sqrt_distance = Math.sqrt(distanceToPlayer)
             if(sqrt_distance > 400){
                 speed = 30
-            }else if(sqrt_distance > 150){
-                speed = 4.5
             }else {
-                speed = 3
+                if(sqrt_distance < 250){
+                    if(!this.walk_sound.isPlaying) this.walk_sound.play()
+                }else if(this.walk_sound.isPlaying) this.walk_sound.stop()
+                if(sqrt_distance < 70){
+                    if(!this.scream_sound.isPlaying && !this.scream) {
+                        this.scream = true
+                        this.scream_sound.play()
+                    }
+                }else this.scream = false
+
+                if(sqrt_distance > 150){
+                    speed = 4.5
+                }else {
+                    speed = 3
+                }
             }
             if(this.path.length > 1){
                 this.moveToPlayer.x = Phaser.Math.Linear(this.moveToPlayer.x, 0, 0.2)

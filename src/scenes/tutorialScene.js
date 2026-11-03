@@ -42,7 +42,7 @@ export default class TutorialScene extends Phaser.Scene {
             "Use arrow keys to move around",
             "Use up arrow key to jump",
             "While sliding down a wall, press up arrow again to jump again",
-            "Press space to merge into the walls for 3 seconds",
+            "Press space to merge into the walls for 3 seconds (You must be on the floor to use this ability)",
             "While merged use arrow keys to move",
             "While merged inside the walls press space again to exit early",
             "The number in the bottom left corner shows the cooldown before you can use the merge ability again",
